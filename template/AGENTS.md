@@ -25,7 +25,7 @@ A more specific `AGENTS.md` in a subdirectory takes precedence for its scope.
 - Do not rewrite, rename, move, or reformat unrelated code.
 - Preserve existing patterns and style; prefer repository conventions over personal preference.
 - Prefer simple, maintainable solutions over clever ones. No speculative refactors or broad refactors unless requested.
-- If something is unclear, infer the most reasonable option from the repository structure and existing patterns.
+- Questions go at the start of the task (see Requirements). While executing, do not stop to ask: infer the most reasonable option from the agreed requirement, the repository structure, and existing patterns, and state the assumption in the report.
 - Do not introduce dependencies without a concrete, justified need.
 - Treat existing uncommitted changes as the user's work. Do not revert, absorb, or rewrite them unless told to.
 - Do not stage, unstage, commit, or otherwise modify the Git staging area unless the user explicitly asks.
@@ -111,12 +111,23 @@ Index files: do not add barrel files by default. Use one `index.ts` at a module 
 {{STACK:ui-rules}}
 <!-- END:agent-rules:ui -->
 
+<!-- BEGIN:agent-rules:requirements -->
+## Requirements
+
+Every task starts by defining the requirement with the user, so the rest of the task runs without further input.
+
+1. Read the request and the relevant code first, so the questions cover only what the repository cannot answer.
+2. Ask everything that is open in one message, before planning or editing: scope, expected behavior, edge cases, acceptance criteria, constraints. Propose an inferred default for each question so the user can confirm quickly. If nothing is open, state the requirement as understood and proceed.
+3. Record the agreed requirement as a short list of observable behaviors. It is the input to step 1 of Planning.
+4. After that, do not ask again. Resolve new doubts from the agreed requirement and the repository patterns, and state each assumption in the report. Anything that would need a new decision from the user (a deployment, a new dependency, a destructive action, a change of scope) is left out of the change and reported as a follow-up.
+<!-- END:agent-rules:requirements -->
+
 <!-- BEGIN:agent-rules:planning -->
 ## Planning
 
 All implementation plans follow TDD by default. For any behavior change, the plan is:
 
-1. Define the expected behavior.
+1. Define the expected behavior, from the agreed requirement (see Requirements).
 2. Add or update a failing test.
 3. Implement the minimum change that makes it pass.
 4. Run the relevant tests.
@@ -198,6 +209,7 @@ Profiles and skills are described in `docs/agent-workflows.md`. Skills live in `
 - The primary thread owns the full user request, the constraints in this file, integration, validation, and the final report.
 - Delegate only bounded, independent work when it improves the result. Prefer parallel read-only searches or reviews; assign one owner per edited file.
 - Delegated agents follow this file and never override the user's instructions on deployment or running the full E2E suite.
+- Delegated agents do not ask the user. They work from the agreed requirement and return open questions to the primary thread.
 <!-- END:agent-rules:orchestration -->
 
 <!-- Project-specific rules go below this line (domain invariants, terminology, environments, safety rules). They are preserved when the template is re-applied. -->

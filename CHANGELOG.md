@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0 — 2026-10-12
+
+- `AGENTS.md`: new `requirements` block. Every task starts with one round of questions that defines the requirement; no questions during execution. `working-style`, `planning`, and `orchestration` updated to match.
+- `APPLY.md`: when re-applying, blocks the project does not have yet are inserted in template order.
+
 ## 1.0.0 — 2026-10-11
 
 Initial extraction from `california-anime`, with rules consolidated from `doctor`, `selfservice-web`, and `MutuusCoreWeb`.
