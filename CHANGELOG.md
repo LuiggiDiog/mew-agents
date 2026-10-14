@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0 — 2026-10-14
+
+- `AGENTS.md` `planning`: every request is broken into small tasks, one per observable behavior, each with a defined check (a red-to-green test or a named alternative for test-ineligible work).
+
 ## 1.1.0 — 2026-10-12
 
 - `AGENTS.md`: new `requirements` block. Every task starts with one round of questions that defines the requirement; no questions during execution. `working-style`, `planning`, and `orchestration` updated to match.

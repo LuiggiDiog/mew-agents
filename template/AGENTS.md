@@ -125,7 +125,9 @@ Every task starts by defining the requirement with the user, so the rest of the 
 <!-- BEGIN:agent-rules:planning -->
 ## Planning
 
-All implementation plans follow TDD by default. For any behavior change, the plan is:
+Break every request into small tasks before implementing. Derive them from the agreed requirement (see Requirements): one task per observable behavior, in dependency order. Each task has a defined check that proves it is done: a test that goes from red to green, or, for a test-ineligible task (see TDD policy), a named alternative such as typecheck, lint, `--list`, or inspection. If a task has no check, split or merge it until it has one; do not split further than that.
+
+Each task with a behavior change follows TDD. Its plan is:
 
 1. Define the expected behavior, from the agreed requirement (see Requirements).
 2. Add or update a failing test.
