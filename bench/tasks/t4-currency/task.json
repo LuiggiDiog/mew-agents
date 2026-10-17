@@ -1,0 +1,12 @@
+{
+  "id": "t4-currency",
+  "size": "small",
+  "prompt": "Muestra todos los precios en soles peruanos, con el formato \"S/ 3.00\".",
+  "answer": "Confirmado. Usa los valores por defecto que propusiste.",
+  "testFirst": true,
+  "note": "formatPrice lives in the cart module but the catalog uses it too: specs tagged @catalog break although no catalog file changes. Selecting E2E specs by touched-module tag alone misses them; the full suite run by the harness catches it.",
+  "hidden": [
+    { "src": "zz-hidden.test.ts", "dest": "src/modules/cart/services/zz-hidden.test.ts", "kind": "unit" },
+    { "src": "zz-hidden.spec.ts", "dest": "e2e/tests/zz-hidden.spec.ts", "kind": "e2e" }
+  ]
+}

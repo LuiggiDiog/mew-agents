@@ -1,0 +1,15 @@
+{
+  "id": "t3-remove",
+  "size": "medium",
+  "prompt": "Permite que el usuario quite productos del carrito.",
+  "answer": "Quitar resta una unidad por clic: cada fila del carrito tiene un botón con nombre accesible \"Remove <nombre del producto>\" (por ejemplo \"Remove Coffee\"). Si la cantidad llega a 0, la fila desaparece. Sin confirmación. Para todo lo demás usa los valores por defecto que propusiste.",
+  "testFirst": true,
+  "hidden": [
+    {
+      "src": "zz-hidden.spec.ts",
+      "dest": "e2e/tests/zz-hidden.spec.ts",
+      "kind": "e2e"
+    }
+  ],
+  "note": "The answer contradicts the natural default (remove the whole row): an agent that does not ask fails the hidden test."
+}

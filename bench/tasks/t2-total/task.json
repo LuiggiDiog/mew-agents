@@ -1,0 +1,11 @@
+{
+  "id": "t2-total",
+  "size": "small",
+  "prompt": "El total del carrito está mal cuando se agrega el mismo producto más de una vez. Corrígelo.",
+  "answer": "Confirmado. Usa los valores por defecto que propusiste.",
+  "testFirst": true,
+  "hidden": [
+    { "src": "zz-hidden.test.ts", "dest": "src/modules/cart/services/zz-hidden.test.ts", "kind": "unit" },
+    { "src": "zz-hidden.spec.ts", "dest": "e2e/tests/zz-hidden.spec.ts", "kind": "e2e" }
+  ]
+}

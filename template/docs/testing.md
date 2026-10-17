@@ -33,10 +33,10 @@ The exact commands are defined once, in the Toolchain section of `AGENTS.md`. Th
 | Discover E2E specs without starting the server | `e2e` with `--list` |
 | One E2E spec | `e2e` with `{{E2E_DIR}}/<flow>.spec.ts` |
 | One E2E test by title | `e2e` with `--grep "<title>"` |
-| Specs changed since the last commit, and their page objects and helpers | `e2e` with `--only-changed` |
+| Specs with uncommitted changes, or whose page objects and helpers changed | `e2e` with `--only-changed` (`--only-changed=<base>` once committed) |
 | Specs of a touched module | `e2e` with `--grep "@<module>"` |
 | Only the specs that failed last run | `e2e` with `--last-failed` |
-| Final run against a production build | `e2e-prod` with the same selection |
+| Level 2 run against a production build | `e2e-prod` with the level 2 selection |
 | One mobile spec | `e2e` with `--project=mobile {{E2E_DIR}}/<flow>.mobile.spec.ts` |
 | Debug an E2E spec | `e2e` with `--debug {{E2E_DIR}}/<flow>.spec.ts` |
 | Open a failure trace | `e2e-trace` with `<test-results>/<run>/trace.zip` |

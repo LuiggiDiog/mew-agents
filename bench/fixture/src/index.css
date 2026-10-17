@@ -1,0 +1,12 @@
+:root {
+  --color-primary: #0d7665;
+  --color-surface: #ffffff;
+  --color-on-surface: #24343e;
+}
+
+body {
+  margin: 0 16px;
+  font-family: system-ui, sans-serif;
+  color: var(--color-on-surface);
+  background: var(--color-surface);
+}

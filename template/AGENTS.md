@@ -25,7 +25,7 @@ A more specific `AGENTS.md` in a subdirectory takes precedence for its scope.
 - Do not rewrite, rename, move, or reformat unrelated code.
 - Preserve existing patterns and style; prefer repository conventions over personal preference.
 - Prefer simple, maintainable solutions over clever ones. No speculative refactors or broad refactors unless requested.
-- Questions, when the task needs them, go at the start (see Requirements). While executing, do not stop to ask: infer the most reasonable option from the requirement, the repository structure, and existing patterns, and state the assumption in the report.
+- Questions go at the start of the task (see Requirements). While executing, do not stop to ask: infer the most reasonable option from the agreed requirement, the repository structure, and existing patterns, and state the assumption in the report.
 - Do not re-read a file that is already in context, and read only the sections of a doc that the task needs.
 - Do not introduce dependencies without a concrete, justified need.
 - Treat existing uncommitted changes as the user's work. Do not revert, absorb, or rewrite them unless told to.
@@ -112,7 +112,7 @@ Adding a dependency still needs a justified need (see Working style).
 | `test-related` | `{{CMD_TEST_RELATED}}` | Unit tests that cover the given source files |
 | `lint-files` | `{{CMD_LINT_FILES}}` | Lint only the given files, with cache |
 | `e2e` | `{{CMD_E2E}}` | Playwright against the dev server; append a spec path, `--list`, `--grep "<title or @tag>"`, `--only-changed`, `--last-failed`, `-x`, or `--debug` |
-| `e2e-prod` | `E2E_PROD=1 {{CMD_E2E}}` | Playwright against a production build: final validation and CI (CI sets it through `CI`) |
+| `e2e-prod` | `E2E_PROD=1 {{CMD_E2E}}` | Playwright against a production build: final validation and CI (CI sets it through `CI`). POSIX shell; in PowerShell set `$env:E2E_PROD=1` first |
 | `e2e-install` | `{{EXEC:playwright install chromium}}` | Playwright browser, once per machine |
 | `e2e-trace` | `{{EXEC:playwright show-trace <trace.zip>}}` | Open a Playwright trace |
 | `design-lint` | `{{DLX:@google/design.md lint DESIGN.md}}` | Validate `DESIGN.md` |
@@ -153,13 +153,12 @@ Index files: do not add barrel files by default. Use one `index.ts` at a module 
 <!-- BEGIN:agent-rules:requirements -->
 ## Requirements
 
-Size the requirement round to the task, so the rest of it runs without further input. When unsure between two sizes, take the larger.
+Every task starts by defining the requirement with the user, so the rest of the task runs without further input.
 
-- **Trivial** (a typo, a copy edit, a one-file fix with an obvious expected result): do it without asking.
-- **Small** (a clear request with one reasonable interpretation): state the requirement and any assumption in one or two lines, then proceed without waiting.
-- **Medium or ambiguous** (several behaviors, more than one reasonable interpretation, or a change to public behavior): read the request and the relevant code first, then ask everything open in one message (scope, expected behavior, edge cases, acceptance criteria, constraints), each with a proposed default.
-
-The requirement is a short list of observable behaviors and the input to planning. After it, do not ask again: resolve doubts from the requirement and the repository patterns, and state each assumption in the report. Anything that needs a new decision from the user (a deployment, a new dependency, a destructive action, a change of scope) stays out of the change and is reported as a follow-up.
+1. Read the request and the relevant code first, so the questions cover only what the repository cannot answer.
+2. Ask everything that is open in one message, before planning or editing: scope, expected behavior, edge cases, acceptance criteria, constraints. Propose an inferred default for each question so the user can confirm quickly. If nothing is open, state the requirement as understood and proceed.
+3. Record the agreed requirement as a short list of observable behaviors. It is the input to Planning and TDD.
+4. After that, do not ask again. Resolve new doubts from the agreed requirement and the repository patterns, and state each assumption in the report. Anything that would need a new decision from the user (a deployment, a new dependency, a destructive action, a change of scope) is left out of the change and reported as a follow-up.
 <!-- END:agent-rules:requirements -->
 
 
@@ -208,11 +207,14 @@ Validate every change with the smallest scope that proves it. Climb one level on
 | Level | When | Unit | E2E |
 | --- | --- | --- | --- |
 | 1. Focused | While iterating on a task | `test-file` with the test being written | `e2e` with the spec, `--grep "<title>"`, and `-x` |
-| 2. Related | Once the tasks are green, before reporting | `test-related` with the touched source files | `e2e --only-changed` (changed specs, page objects, helpers) plus `--grep "@<module>"` for each touched module |
-| 3. Failed | After fixing failures found at level 2 | the failing test files | `e2e --last-failed` |
+| 2. Related | Once the tasks are green, before reporting | `test-related` with the touched source files | `e2e-prod` once, with the union of changed specs and specs tagged with each touched module (see below) |
+| 3. Failed | After fixing failures found at level 2 | the failing test files | the command that failed, with `--last-failed` |
 | 4. Full | Only on explicit request; for unit tests also when test config, dependencies, or a module imported almost everywhere changed | `test` | the complete `e2e`, only on explicit request |
 
-- E2E levels 1–3 run against the dev server. The last E2E run before reporting repeats the level 2 selection with `e2e-prod`.
+- E2E level 1 runs against the dev server; level 2 runs once against a production build (`e2e-prod`), so the build is paid once per task.
+- The level 2 E2E selection is a union of spec files, passed explicitly to one `e2e-prod` call: the files that `e2e --list --only-changed` reports (changed specs, and specs whose page objects or helpers changed) plus the files tagged with each touched module (`grep -rl "@<module>" {{E2E_DIR}}`). Never put `--only-changed` and `--grep` in the same command: Playwright intersects them.
+- Never accept an empty selection as green. `--only-changed` sees only uncommitted changes: when the work is already committed, pass the base branch (`--only-changed=<base>`). When a touched module has no tagged spec, find its specs by route, page object, or visible text, run them, and report the missing tag as a follow-up.
+- Prefer automated checks; use manual verification or inspection only for what no automated check can prove, and say so in the report.
 - Skip what the change cannot affect: documentation-only changes run no tests; style-only changes run no unit tests and are inspected instead; a test-only change runs only that test.
 - Run `lint-files` on the touched files and `typecheck` once per task, not after every edit. Do not re-run a green check unless the code it covers changed since.
 - Do not run the `build` command unless the user asks, or production behavior cannot be validated otherwise (`e2e-prod` already covers E2E).
@@ -235,7 +237,7 @@ Delegate only when all three hold:
 - Use the fewest agents that cover the independent parts, at most 3 at once, launched together.
 - Each brief is self-contained: goal, files owned, the agreed contract, the checks to run, what not to touch, and what to return (changed files, commands run, results, open questions).
 - Do not delegate sequential steps, edits to the same file, decisions the other parts depend on (settle those first in the primary thread), or work that needs the user.
-- Delegated agents follow this file, never override the user's instructions on deployment or the full E2E suite, do not ask the user, and return open questions to the primary thread.
+- Delegated agents follow this file and work from the agreed requirement. They never override the user's instructions on deployment or the full E2E suite, do not ask the user, and return open questions to the primary thread.
 - After integrating, the primary thread runs the level 2 selection (see Validation) once on the combined diff.
 <!-- END:agent-rules:orchestration -->
 

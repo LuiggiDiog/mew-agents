@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.5.2 — 2026-10-17
+
+- `requirements`: back to the 1.2.0 rule, where every task starts by defining the requirement and asks everything open in one message, with a proposed default for each question. The 1.5.0 size tiers let the agent skip questions it should have asked: in the benchmark it named the ambiguity as an assumption, did not ask, and failed the hidden tests of the ambiguous task 3 out of 3 times (`bench/results/20261017-1649`). `working-style` goes back to its matching line.
+
+## 1.5.1 — 2026-10-17
+
+- `validation`: an empty E2E selection is never green; `--only-changed=<base>` once the work is committed; untagged modules fall back to finding specs by route, page object, or visible text. Restores the rule to prefer automated checks over manual verification.
+- E2E level 2 is the union of changed specs and module-tagged specs, passed as explicit files: `--only-changed` and `--grep` in one command intersect, which would under-select.
+- E2E level 2 runs once with `e2e-prod` instead of on the dev server and then again on a production build; level 3 re-runs the command that failed with `--last-failed`.
+- `orchestration`: delegated agents work from the agreed requirement (restored).
+- Fixed the level 2 row of the test selection table in `validation` (a missing column separator).
+- New `bench/`: behavioral benchmark that runs the same tasks on a fixture project with each template version and compares speed and quality.
+- Skills read `AGENTS.md` only when it is not already in context, which covers subagents that do not load it. `e2e-prod` documents the PowerShell form.
+
 ## 1.5.0 — 2026-10-17
 
 - `AGENTS.md` `requirements`: the question round scales with the task (trivial: act; small: state the requirement and proceed; medium or ambiguous: one round of questions).

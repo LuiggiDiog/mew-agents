@@ -236,8 +236,8 @@ Follow the test selection ladder in `AGENTS.md` (Validation). For E2E it means:
 
 1. `e2e --list` after structural edits.
 2. While iterating: the changed spec with `--grep "<title>"` and `-x`, against the dev server.
-3. Before reporting: `--only-changed` plus `--grep "@<module>"` for each touched module; after fixing failures, `--last-failed`.
-4. Final run: the same selection with `e2e-prod`, against a production build.
+3. Before reporting, once: `e2e-prod` with the union of spec files from `e2e --list --only-changed` and from `grep -rl "@<module>"` for each touched module, passed as explicit paths (both filters in one command intersect). Use `--only-changed=<base>` when the work is committed; if a touched module has no tagged spec, find its specs by route, page object, or visible text. An empty selection is never green.
+4. After fixing failures: the command that failed, with `--last-failed`.
 5. The complete suite only when the user asks for it.
 
 On failure: open the trace first, then capture the URL, visible blockers, and console errors. Document the root cause and fix pattern.

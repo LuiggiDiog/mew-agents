@@ -1,0 +1,44 @@
+{
+  "common": {
+    "PROJECT_NAME": "bench-shop",
+    "RESPONSE_LANGUAGE": "Spanish",
+    "NODE_VERSION": "`lts/krypton` (Node 24 LTS)",
+    "PM": "pnpm",
+    "STACK": "vite-react",
+    "FRAMEWORK_DOCS": "`https://vite.dev/guide/` and `https://react.dev/reference`",
+    "SOURCE_DIR": "`src/`",
+    "STYLE_TOKENS_FILE": "src/index.css",
+    "E2E_DIR": "e2e/tests",
+    "E2E_CONFIG": "e2e/playwright.config.ts",
+    "CMD_DEV": "pnpm run dev",
+    "CMD_BUILD": "pnpm run build",
+    "CMD_LINT": "pnpm run lint",
+    "CMD_TEST": "pnpm run test",
+    "CMD_TEST_WATCH": "pnpm run test:watch",
+    "CMD_TEST_FILE": "pnpm run test <file>",
+    "CMD_E2E": "pnpm exec playwright test --config=e2e/playwright.config.ts"
+  },
+  "versions": {
+    "1.2.0": {
+      "ref": "52a4d34",
+      "playwright": "prod-always",
+      "vars": {
+        "PM_EXEC": "pnpm exec",
+        "CMD_TYPECHECK": "pnpm run typecheck"
+      }
+    },
+    "1.5.2": {
+      "ref": "WORKTREE",
+      "playwright": "dev-prod",
+      "vars": {
+        "PM_LOCKFILE": "pnpm-lock.yaml",
+        "PM_INSTALL": "pnpm install",
+        "PM_ADD": "pnpm add",
+        "PM_ADD_DEV": "pnpm add -D",
+        "CMD_TYPECHECK": "pnpm exec tsc --noEmit --incremental",
+        "CMD_TEST_RELATED": "pnpm exec vitest related --run <files>",
+        "CMD_LINT_FILES": "pnpm exec eslint --cache <files>"
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "id": "t1-typo",
+  "size": "trivial",
+  "prompt": "Los botones de los productos dicen \"Add to crat\". Corrige el typo.",
+  "answer": "Confirmado. Usa los valores por defecto que propusiste.",
+  "testFirst": false,
+  "hidden": [{ "src": "zz-hidden.spec.ts", "dest": "e2e/tests/zz-hidden.spec.ts", "kind": "e2e" }]
+}

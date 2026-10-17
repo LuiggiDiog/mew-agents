@@ -1,0 +1,3 @@
+__pycache__/
+# Raw transcripts are large and contain full tool output; metrics.json and REPORT.md are kept.
+results/*/runs/*/transcript-*.jsonl
