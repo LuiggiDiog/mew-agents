@@ -44,6 +44,7 @@ The exact commands are defined once, in the Toolchain section of `AGENTS.md`. Th
 | Discover E2E specs without starting the server | `e2e` with `--list` |
 | One E2E spec | `e2e` with `{{E2E_DIR}}/<flow>.spec.ts` |
 | One E2E test by title | `e2e` with `--grep "<title>"` |
+| One mobile spec | `e2e` with `--project=mobile {{E2E_DIR}}/<flow>.mobile.spec.ts` |
 | Debug an E2E spec | `e2e` with `--debug {{E2E_DIR}}/<flow>.spec.ts` |
 | Open a failure trace | `e2e-trace` with `<test-results>/<run>/trace.zip` |
 

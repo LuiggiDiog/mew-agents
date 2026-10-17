@@ -98,7 +98,7 @@ Copy from `template/` into the project root, after filling variables and snippet
 | `AGENTS.md` | Write it | **Merge** (see step 5) |
 | `CLAUDE.md` | Write `@AGENTS.md` | Keep if it already loads `AGENTS.md`; if it only links to it, replace with `@AGENTS.md` and say why (a link does not load the content) |
 | `DESIGN.md` | Write the skeleton | **Never overwrite.** Keep as is |
-| `.agents/skills/*/SKILL.md` | Write all four | Replace a skill with the same name; keep other skills |
+| `.agents/skills/*/SKILL.md` | Write all five | Replace a skill with the same name; keep other skills |
 | `.claude/skills` | Symlink to `../.agents/skills` | Keep; if `.claude/skills` is a real folder, move its skills to `.agents/skills/` and ask before replacing it with the symlink |
 | `.claude/agents/*.md`, `.codex/agents/*.toml` | Write all five in each format the user uses | Replace profiles with the same name; keep others |
 | `.codex/config.toml` | Write it | Keep the existing one |

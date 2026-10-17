@@ -34,6 +34,7 @@ The stronger model goes to work with coupled correctness constraints (business l
 | `tdd-change`           | Any behavior change, bug fix, or new feature.                                                    |
 | `e2e-playwright`       | Writing, debugging, or stabilizing E2E specs, or verifying a flow in a browser.                  |
 | `ui-accessibility`     | Changing screens, components, layout, styling, copy, or accessibility.                           |
+| `mobile-ux`            | Auditing and improving the mobile and responsive experience of existing screens or flows.        |
 | `release-verification` | Reviewing regressions, verifying a finished change, or an explicitly requested full run/deploy.  |
 
 ## Orchestration rules

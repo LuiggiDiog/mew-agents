@@ -146,7 +146,82 @@ Off by default. When a run is meant to be shared with non-engineers:
 - Record at viewport size (`video: { mode: 'on', size: { width: 1280, height: 720 } }`); the default 800×450 is blurry. Contexts created with `browser.newContext()` need `recordVideo.size` set explicitly, so use a factory in `helpers/`.
 - Gate demo pauses behind an env var (`E2E_DEMO_PAUSES=true`) so normal runs stay fast.
 
-## 12. Validation order
+## 12. Mobile checks
+
+Mobile specs are named `<flow>.mobile.spec.ts` and run in their own project, so desktop specs do not run twice. Add the project to `{{E2E_CONFIG}}` with the first mobile spec:
+
+```ts
+projects: [
+  { name: 'chromium', use: { ...devices['Desktop Chrome'] }, testIgnore: /\.mobile\.spec\.ts$/ },
+  // Chromium-based device: mobile viewport and touch without installing WebKit.
+  { name: 'mobile', use: { ...devices['Pixel 7'] }, testMatch: /\.mobile\.spec\.ts$/ },
+],
+```
+
+Run one with the `e2e` command and `--project=mobile <spec>`. Emulation covers viewport, touch, and user agent, not iOS Safari rendering; say so when reporting (`devices['iPhone 13']` needs the WebKit browser).
+
+`{{E2E_DIR}}/helpers/mobile.ts`, created with the first mobile spec:
+
+```ts
+import { expect, type Locator, type Page } from '@playwright/test';
+
+/** Fails when the page scrolls horizontally, naming the elements that stick out. */
+export async function expectNoHorizontalOverflow(page: Page) {
+  const { overflow, offenders } = await page.evaluate(() => {
+    const root = document.documentElement;
+    const overflow = root.scrollWidth - root.clientWidth;
+    const offenders =
+      overflow > 0
+        ? [...document.body.querySelectorAll<HTMLElement>('*')]
+            .filter((el) => el.getBoundingClientRect().right > root.clientWidth + 1)
+            .slice(0, 5)
+            .map((el) => el.outerHTML.slice(0, 120))
+        : [];
+    return { overflow, offenders };
+  });
+  expect(overflow, `page scrolls horizontally:\n${offenders.join('\n')}`).toBeLessThanOrEqual(0);
+}
+
+/** Fails when a visible control inside `scope` is under `min` CSS pixels (WCAG 2.5.8). */
+export async function expectTouchTargets(scope: Locator, min = 24) {
+  const small = await scope.evaluate((root, min) => {
+    const controls =
+      'a[href], button, input:not([type="hidden"]), select, textarea, summary, [role="button"], [role="link"], [role="tab"], [role="checkbox"], [role="switch"]';
+    return [...root.querySelectorAll<HTMLElement>(controls)]
+      // Inline text links are exempt; a labeled input's label is part of its target.
+      .filter((el) => getComputedStyle(el).display !== 'inline')
+      .filter((el) => !(el instanceof HTMLInputElement && el.labels?.length))
+      // Visually hidden elements (sr-only, visually-hidden) are not targets.
+      .filter((el) => {
+        const style = getComputedStyle(el);
+        return !style.clip.startsWith('rect') && !style.clipPath.startsWith('inset(50%');
+      })
+      .map((el) => ({ el, box: el.getBoundingClientRect() }))
+      .filter(({ box }) => box.width > 1 && box.height > 1 && (box.width < min || box.height < min))
+      .map(({ el, box }) => `${Math.round(box.width)}x${Math.round(box.height)} ${el.outerHTML.slice(0, 80)}`);
+  }, min);
+  expect(small, `controls smaller than ${min}px`).toEqual([]);
+}
+```
+
+A mobile spec checks each agreed width after the page is ready:
+
+```ts
+import { test } from '@playwright/test';
+import { expectNoHorizontalOverflow, expectTouchTargets } from './helpers/mobile';
+import { CheckoutPage } from './pages/checkout.page';
+
+for (const width of [320, 375]) {
+  test(`checkout fits a ${width}px screen`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
+    await new CheckoutPage(page).goto();
+    await expectNoHorizontalOverflow(page);
+    await expectTouchTargets(page.getByRole('main'));
+  });
+}
+```
+
+## 13. Validation order
 
 1. The `e2e` command with `--list` after structural edits (commands are in the Toolchain section of `AGENTS.md`).
 2. The `e2e` command with the changed spec or test (`--grep "<title>"`).
@@ -154,7 +229,7 @@ Off by default. When a run is meant to be shared with non-engineers:
 
 On failure: open the trace first, then capture the URL, visible blockers, and console errors. Document the root cause and fix pattern.
 
-## 13. Failure signatures
+## 14. Failure signatures
 
 | Symptom                                   | Typical cause                                 | Fix                                                 |
 | ----------------------------------------- | --------------------------------------------- | --------------------------------------------------- |
@@ -165,8 +240,10 @@ On failure: open the trace first, then capture the URL, visible blockers, and co
 | Expected business error never appears     | Input rejected at a parsing or auth layer     | Walk the real path that produces the state          |
 | Process hangs after a failed run          | HTML reporter opened a server                 | `reporter: [['html', { open: 'never' }]]`           |
 | Passes locally, fails on a clean run      | Reused dev server or leftover data            | `reuseExistingServer: false`; unique runtime data   |
+| Every spec runs twice                     | Mobile project without `testMatch`            | Split projects by the `.mobile.spec.ts` suffix      |
+| Overflow check passes, page still clipped | `overflow-x: hidden` on `html` or `body`      | Remove it and fix the element that sticks out       |
 
-## 14. Spec checklist
+## 15. Spec checklist
 
 - [ ] Flow map and destination URLs written down.
 - [ ] Real vs mock decided per step; server-side fakes go through env.
@@ -175,5 +252,6 @@ On failure: open the trace first, then capture the URL, visible blockers, and co
 - [ ] No `waitForTimeout` for synchronization.
 - [ ] Unique runtime data; bounded retries only for known conflicts.
 - [ ] Exact URL assertions; no bridge-only tests.
+- [ ] Flows with a mobile concern have a `*.mobile.spec.ts` with overflow and target checks at the agreed widths.
 - [ ] Validated with `--list`, then the targeted spec.
 - [ ] Flow docs updated in the same change.

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.0 — 2026-10-17
+
+- New skill `mobile-ux`: audits and improves the mobile and responsive experience of existing screens, mobile-first, with a prioritized checklist (touch and access, layout and reflow, navigation and overlays, mobile forms, perceived performance). Reusable rules go to `DESIGN.md`.
+- `docs/e2e-playbook.md`: Mobile checks section with a `mobile` Playwright project for `*.mobile.spec.ts` and helpers for horizontal overflow and touch-target size; new failure signatures and checklist item.
+- `ui-accessibility`, the `product-ui` profiles, `docs/agent-workflows.md`, `docs/testing.md`, and `DESIGN.md` point to the new skill and the mobile spec command.
+
 ## 1.3.0 — 2026-10-17
 
 - Package-manager agnostic: the `toolchain` block of `AGENTS.md` is the only place that names the runtime, the package manager, and the exact commands (new Package manager and Commands tables). Skills, agent profiles, `DESIGN.md`, and docs refer to commands by name (`test-file`, `e2e`, `design-lint`, ...).

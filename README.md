@@ -11,7 +11,7 @@ template/                # files copied into a project, with {{VARIABLES}} and {
   AGENTS.md              # rules, split into BEGIN/END marked blocks
   CLAUDE.md              # @AGENTS.md
   DESIGN.md              # design standards skeleton (Google Labs DESIGN.md format)
-  .agents/skills/        # tdd-change, e2e-playwright, ui-accessibility, release-verification
+  .agents/skills/        # tdd-change, e2e-playwright, ui-accessibility, mobile-ux, release-verification
   .claude/agents/        # Claude Code profiles (.md); .claude/skills -> ../.agents/skills
   .codex/agents/         # Codex profiles (.toml) + .codex/config.toml
   docs/                  # testing, e2e-playbook, agent-workflows, architecture skeleton

@@ -66,7 +66,7 @@ Breakpoints and what changes at each one (navigation, columns, floating controls
 
 ### Responsive verification
 
-The viewport widths, zoom levels, and screens to check after a layout change, and what must remain visible and operable. Not defined yet.
+The viewport widths (for example 320, 375, 768, 1024, and 1440 CSS pixels), zoom levels, and screens to check after a layout change, and what must remain visible and operable. The `mobile-ux` skill audits against these. Not defined yet.
 
 ## Elevation & Depth
 
