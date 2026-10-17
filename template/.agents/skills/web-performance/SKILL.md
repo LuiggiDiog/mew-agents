@@ -1,0 +1,29 @@
+---
+name: web-performance
+description: Use to measure and improve the Lighthouse scores (performance, accessibility, best practices, SEO) of key routes, or when a change risks them (images, fonts, third-party scripts, new client dependencies, routing, build configuration). Skip for service-only or test-only work.
+---
+
+# Web performance workflow
+
+1. `AGENTS.md` is normally already in context; read it only if it is not. Commands named below are defined in its Toolchain section. Read `lighthouserc.json` (key routes and thresholds) and, before changing framework behavior, the framework documentation for the installed version ({{FRAMEWORK_DOCS}}).
+2. Measure first. Reuse the production build that `e2e-prod` just made for this code, or run `build`; then run `lighthouse` and summarize with `node .agents/skills/web-performance/scripts/lighthouse-audits.mjs`, which prints per route the median scores and the audits that cost points. `lighthouse` uses the installed Chrome; without one, set `CHROME_PATH` to Playwright's Chromium (`node -e "console.log(require('@playwright/test').chromium.executablePath())"`).
+3. Prioritize: categories below their threshold first; within Performance, the metric with the largest gap (usually LCP, then TBT, then CLS). Accessibility fixes follow the `ui-accessibility` skill.
+4. Fix one cause at a time with the smallest change, following the Performance rules in `AGENTS.md` and the checklist below. A fix that changes behavior (lazy loading a component, deferring a script) keeps its tests green, and gets a test first when it adds behavior.
+5. Re-measure the affected routes and compare medians; Lighthouse varies between runs, so a change under 3 points is noise. Then run the level 2 test selection once.
+6. Never lower a threshold, remove a route, or disable an audit to pass, and never remove a feature for score. If a threshold cannot be met (for example, a required third-party script), report the audit, its cost, and the options.
+7. Report a before-and-after table per route and category, the causes fixed, the commands run, and what remains below threshold.
+
+## Checklist
+
+**Performance**
+
+- LCP: the LCP image is in the initial HTML, never lazy-loaded, with `fetchpriority="high"`, explicit dimensions, and AVIF or WebP at the rendered size. No render-blocking CSS or font loads ahead of it.
+- TBT: code split per route, no long tasks during load, heavy work deferred or moved off the main thread, third-party scripts loaded after the page.
+- CLS: dimensions or `aspect-ratio` on media and embeds, space reserved for late content, fonts with `font-display: swap` and a metric-matched fallback.
+- Network: text compressed (gzip or brotli), hashed static assets with long cache lifetimes, `preconnect` to required origins, no unused JavaScript or CSS shipped on the route.
+
+**Accessibility** (see `ui-accessibility`): names on controls and links, contrast, `lang`, heading order, `alt`, form labels.
+
+**Best practices**: HTTPS resources only, no console errors, no deprecated APIs, images at their natural aspect ratio and sufficient resolution.
+
+**SEO**: unique `<title>` and meta description per page, viewport meta, `lang`, crawlable `<a href>` links with descriptive text, a valid `robots.txt` (an SPA fallback that serves `index.html` for it fails the audit), a canonical URL on indexable pages, and HTTP 200 on audited routes.

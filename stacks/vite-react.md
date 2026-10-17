@@ -2,6 +2,8 @@
 
 Snippets for `{{STACK:<name>}}` markers. Based on a Vite + React single-page app with React Router, Redux, MUI, Vitest, and Playwright under `e2e/`. Values marked "verify" differ between projects; confirm them in step 1 of `APPLY.md`. Commands use the `{{RUN:…}}`, `{{EXEC:…}}`, and `{{DLX:…}}` forms from step 3 of `APPLY.md` and never name a package manager; check each script name against `package.json`.
 
+`lighthouse-collect`: Lighthouse serves `dist/` itself and falls back to `index.html` for client routes, so build first. Add the key routes (1–5 public, representative URLs) to `url`, keeping the `http://localhost/` prefix; Lighthouse fills in its port.
+
 ### profile-defaults
 
 | Variable | Typical value |
@@ -171,3 +173,16 @@ Iteration runs against the Vite dev server; `e2e-prod` and CI build and serve wi
 | Public route redirects after a successful login | Session persisted in the store | Sign out via the UI, not `localStorage.clear()` |
 | Select option not found | Options render in a portal | Locate inside `getByRole('listbox')` after opening |
 | Specs hit a stale build | Reused dev server | `reuseExistingServer: false` with `vite preview` |
+
+### performance
+
+- Routes load with `React.lazy` and `Suspense`; heavy libraries load with dynamic `import()` where they are used.
+- Check chunk sizes in the `vite build` output, and split a large chunk only when most routes do not need its code.
+- `index.html` holds the default title, description, `lang`, and viewport; each route updates `document.title` and the description. `robots.txt` lives in `public/`.
+- Client-only rendering limits what crawlers see. If a route needs SEO beyond the score, report it as a follow-up instead of adding server rendering.
+
+### lighthouse-collect
+
+      "staticDistDir": "./dist",
+      "isSinglePageApplication": true,
+      "url": ["http://localhost/"],

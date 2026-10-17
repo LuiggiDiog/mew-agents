@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.6.0 — 2026-10-17
+
+- Lighthouse: every key route meets Performance, Best Practices, and SEO 90 and Accessibility 95 on the mobile profile. New `performance` block in `AGENTS.md` with the binding rules and a `{{STACK:performance}}` snippet per stack (Next.js `next/image`, `next/font`, Metadata API, `next/script`; Vite lazy routes and chunk checks; Angular `NgOptimizedImage`, lazy routes, `@defer`, budgets).
+- New `lighthouserc.json` (Lighthouse CI: 3 runs per URL, median, assertions, local reports in `.lighthouseci/`, never uploaded) and `lighthouse` command run through the package manager's `dlx`, with no new dependency. `{{STACK:lighthouse-collect}}` serves the build: `next start` for Next.js, the static `dist` with SPA fallback for Vite and Angular.
+- `validation`: `lighthouse` runs once per task, after level 2, only when the change touches UI, routes, assets, dependencies, or build configuration, reusing the production build `e2e-prod` made.
+- New skill `web-performance` (measure, prioritize, fix, re-measure, report before and after) with `scripts/lighthouse-audits.mjs`, which prints median scores and the audits that cost points.
+
 ## 1.5.2 — 2026-10-17
 
 - `requirements`: back to the 1.2.0 rule, where every task starts by defining the requirement and asks everything open in one message, with a proposed default for each question. The 1.5.0 size tiers let the agent skip questions it should have asked: in the benchmark it named the ambiguity as an assumption, did not ask, and failed the hidden tests of the ambiguous task 3 out of 3 times (`bench/results/20261017-1649`). `working-style` goes back to its matching line.

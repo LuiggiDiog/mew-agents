@@ -27,7 +27,7 @@
         "CMD_TYPECHECK": "pnpm run typecheck"
       }
     },
-    "1.5.2": {
+    "1.6.0": {
       "ref": "WORKTREE",
       "playwright": "dev-prod",
       "vars": {

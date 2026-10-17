@@ -36,9 +36,9 @@ A version is better only if speed improves and quality stays equal or better. Fa
 ## Run it
 
 ```bash
-python3 bench/run.py                          # all tasks, v1.2.0 vs v1.5.2, 3 repetitions, Sonnet, 6 runs at a time
+python3 bench/run.py                          # all tasks, v1.2.0 vs v1.6.0, 3 repetitions, Sonnet, 6 runs at a time
 python3 bench/run.py --reps 5 --model opus    # more repetitions for less noise
-python3 bench/run.py --tasks t2-total --versions 1.5.2
+python3 bench/run.py --tasks t2-total --versions 1.6.0
 python3 bench/run.py --rescore bench/results/<stamp>   # recompute metrics from saved transcripts
 python3 bench/report.py                       # rebuild the latest REPORT.md
 ```

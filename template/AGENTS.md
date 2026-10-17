@@ -115,6 +115,7 @@ Adding a dependency still needs a justified need (see Working style).
 | `e2e-prod` | `E2E_PROD=1 {{CMD_E2E}}` | Playwright against a production build: final validation and CI (CI sets it through `CI`). POSIX shell; in PowerShell set `$env:E2E_PROD=1` first |
 | `e2e-install` | `{{EXEC:playwright install chromium}}` | Playwright browser, once per machine |
 | `e2e-trace` | `{{EXEC:playwright show-trace <trace.zip>}}` | Open a Playwright trace |
+| `lighthouse` | `{{DLX:@lhci/cli autorun}}` | Lighthouse on the key routes in `lighthouserc.json`, against the current production build; reports in `.lighthouseci/` |
 | `design-lint` | `{{DLX:@google/design.md lint DESIGN.md}}` | Validate `DESIGN.md` |
 | `design-export` | `{{DLX:@google/design.md export --format css-tailwind DESIGN.md}}` | Export `DESIGN.md` tokens as CSS |
 
@@ -149,6 +150,20 @@ Index files: do not add barrel files by default. Use one `index.ts` at a module 
 
 {{STACK:ui-rules}}
 <!-- END:agent-rules:ui -->
+
+<!-- BEGIN:agent-rules:performance -->
+## Performance and Lighthouse
+
+Every key route in `lighthouserc.json` meets these Lighthouse scores on the default mobile profile: Performance, Best Practices, and SEO 90; Accessibility 95. The `web-performance` skill holds the measure-fix-verify loop and the full checklist.
+
+- The LCP element loads first: its image is never lazy-loaded, has explicit dimensions and high fetch priority, and is served in a modern format at the rendered size.
+- Ship only the JavaScript a route needs: split per route, load heavy or below-the-fold parts on demand, load third-party scripts after the page, and justify every new client dependency by its size.
+- Reserve space for anything that loads late (images, embeds, fonts) so CLS stays under 0.1. Fonts use `font-display: swap`.
+- Every page has a unique `<title>`, a meta description, `lang` on `<html>`, a viewport meta tag, crawlable `<a href>` links, and `alt` on images. The site serves a valid `robots.txt`.
+- No console errors, deprecated APIs, or HTTP (insecure) resources.
+- Never lower a threshold, remove a route, or disable an audit in `lighthouserc.json` to make a run pass.
+{{STACK:performance}}
+<!-- END:agent-rules:performance -->
 
 <!-- BEGIN:agent-rules:requirements -->
 ## Requirements
@@ -216,6 +231,7 @@ Validate every change with the smallest scope that proves it. Climb one level on
 - Never accept an empty selection as green. `--only-changed` sees only uncommitted changes: when the work is already committed, pass the base branch (`--only-changed=<base>`). When a touched module has no tagged spec, find its specs by route, page object, or visible text, run them, and report the missing tag as a follow-up.
 - Prefer automated checks; use manual verification or inspection only for what no automated check can prove, and say so in the report.
 - Skip what the change cannot affect: documentation-only changes run no tests; style-only changes run no unit tests and are inspected instead; a test-only change runs only that test.
+- Run `lighthouse` once per task, after the level 2 checks, when the change touches UI, routes, assets, dependencies, or build configuration; never for service-only, test-only, or documentation-only changes. It audits the current production build: reuse the one `e2e-prod` just made, or run `build` first. A score under its threshold is a failure, like a red test.
 - Run `lint-files` on the touched files and `typecheck` once per task, not after every edit. Do not re-run a green check unless the code it covers changed since.
 - Do not run the `build` command unless the user asks, or production behavior cannot be validated otherwise (`e2e-prod` already covers E2E).
 - If a command cannot be run, say so and state what should be run manually. Report the level reached and why higher levels were not needed.

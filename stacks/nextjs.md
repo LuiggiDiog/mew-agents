@@ -2,6 +2,8 @@
 
 Snippets for `{{STACK:<name>}}` markers. Each `###` section body replaces the marker with the same name. Based on a Next.js 16 App Router project with React 19, TypeScript, Tailwind CSS v4, Vitest, and Playwright. Commands use the `{{RUN:…}}`, `{{EXEC:…}}`, and `{{DLX:…}}` forms from step 3 of `APPLY.md` and never name a package manager; check each script name against `package.json`.
 
+`lighthouse-collect`: Lighthouse starts the production server itself (`next start`) on a dedicated port, so build first. Add the key routes (1–5 public, representative URLs) to `url`.
+
 ### profile-defaults
 
 | Variable | Typical value |
@@ -203,3 +205,15 @@ The dedicated port avoids clashing with the `dev` command on 3000. Only `e2e-pro
 | Click does nothing right after load | Interaction before hydration | Assert a hydrated-only state first |
 | `webServer` dev command exits at startup | Another `next dev` already runs for the project | Stop it, or run `e2e-prod` |
 | Passes with `e2e`, fails with `e2e-prod` | Behavior differs between dev and production (caching, static rendering) | Fix for production; `e2e-prod` is the reference |
+
+### performance
+
+- Content images use `next/image` with `sizes`; mark the LCP image as a priority image the way the installed version's `next/image` docs describe.
+- Fonts use `next/font`, which self-hosts them and prevents layout shift.
+- Titles, descriptions, and canonical URLs come from the Metadata API (`metadata` or `generateMetadata`); `app/robots.ts` generates `robots.txt`.
+- Third-party scripts use `next/script` with `afterInteractive` or `lazyOnload`. Heavy client components load with `next/dynamic`.
+
+### lighthouse-collect
+
+      "startServerCommand": "{{RUN:start --port 9001}}",
+      "url": ["http://localhost:9001/"],

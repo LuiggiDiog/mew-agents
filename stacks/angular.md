@@ -2,6 +2,8 @@
 
 Snippets for `{{STACK:<name>}}` markers. Based on an Angular 20 CLI application (module-based, Angular Material and Bootstrap, Karma/Jasmine unit tests, Playwright under `e2e/`). Values marked "verify" differ between projects; confirm them in step 1 of `APPLY.md`. Commands use the `{{RUN:…}}`, `{{EXEC:…}}`, and `{{DLX:…}}` forms from step 3 of `APPLY.md` and never name a package manager; check each script name against `package.json`.
 
+`lighthouse-collect`: Lighthouse serves the build output itself, so build first. Replace `<project>` with the `outputPath` in `angular.json` (older builders write to `dist/<project>` without `browser`). With hash routing, key routes look like `http://localhost/#/path`.
+
 ### profile-defaults
 
 | Variable | Typical value |
@@ -170,3 +172,16 @@ Note on `reuseExistingServer`: the template rule prefers `false` so a stale serv
 | Click intercepted after an action | sweetalert2 or toast still visible | Wait for `.swal2-container` count 0 / toast hidden |
 | URL assertion fails on a correct page | Hash router | Assert the hash part |
 | `net::ERR_CERT_AUTHORITY_INVALID` | Local backend certificate | `ignoreHTTPSErrors: true` |
+
+### performance
+
+- Content images use `NgOptimizedImage` (`ngSrc`, with `priority` on the LCP image).
+- Feature routes load lazily (`loadChildren` or `loadComponent`); below-the-fold blocks use `@defer` where the installed version supports it.
+- The production `budgets` in `angular.json` are the bundle-size guard; never raise them to make a build pass.
+- Per-route titles come from the route `title` property or the `Title` service, and descriptions from `Meta`. `robots.txt` is served from the site root through the assets configuration.
+
+### lighthouse-collect
+
+      "staticDistDir": "./dist/<project>/browser",
+      "isSinglePageApplication": true,
+      "url": ["http://localhost/"],

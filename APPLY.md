@@ -89,7 +89,7 @@ Notes:
 - Bun before 1.2 writes `bun.lockb`; use whichever lockfile the project has.
 - For a package manager not in the table, add a column with its equivalents in this file and say so in the report.
 
-Stack snippets: every `{{STACK:<name>}}` marker is replaced by the body of the `### <name>` section of the chosen stack file (without the heading). Markers used: `toolchain`, `architecture`, `ui-rules`, `test-layers`, `testing-setup`, `testing-map`, `layout`, `e2e-gotchas`.
+Stack snippets: every `{{STACK:<name>}}` marker is replaced by the body of the `### <name>` section of the chosen stack file (without the heading). Markers used: `toolchain`, `architecture`, `ui-rules`, `performance`, `lighthouse-collect`, `test-layers`, `testing-setup`, `testing-map`, `layout`, `e2e-gotchas`. The stack file's header explains how to adapt `lighthouse-collect`.
 
 ## 4. Write the files
 
@@ -100,11 +100,13 @@ Copy from `template/` into the project root, after filling variables and snippet
 | `AGENTS.md` | Write it | **Merge** (see step 5) |
 | `CLAUDE.md` | Write `@AGENTS.md` | Keep if it already loads `AGENTS.md`; if it only links to it, replace with `@AGENTS.md` and say why (a link does not load the content) |
 | `DESIGN.md` | Write the skeleton | **Never overwrite.** Keep as is |
-| `.agents/skills/*/SKILL.md` | Write all five | Replace a skill with the same name; keep other skills |
+| `.agents/skills/*/` | Write all six, with their `scripts/` | Replace a skill with the same name; keep other skills |
 | `.claude/skills` | Symlink to `../.agents/skills` | Keep; if `.claude/skills` is a real folder, move its skills to `.agents/skills/` and ask before replacing it with the symlink |
 | `.claude/agents/*.md`, `.codex/agents/*.toml` | Write all five in each format the user uses | Replace profiles with the same name; keep others |
 | `.codex/config.toml` | Write it | Keep the existing one |
 | `docs/testing.md`, `docs/e2e-playbook.md`, `docs/agent-workflows.md` | Write them | Replace, after moving any project-specific content into `docs/context/` or the preserved area and saying so |
+| `lighthouserc.json` | Write it, with the key routes (1–5 public, representative URLs inferred from the router; ask only if none is obvious) | Keep; report thresholds lower than the template's |
+| `.gitignore` | Add `.lighthouseci/` if missing | Same |
 | `docs/architecture.md` | Write the skeleton | **Never overwrite.** Keep as is |
 | `docs/context/` | Do not create | Keep |
 | `.nvmrc`, `package.json` `engines` | Add only if missing and the Node version is known | Keep |
@@ -130,7 +132,7 @@ Run only what exists; do not install anything unless the user chose that in step
 - No package manager is named outside the Toolchain block of `AGENTS.md`: `grep -rnwE 'npm|npx|pnpm|yarn|bun|bunx' .agents .claude/agents .codex/agents DESIGN.md docs/agent-workflows.md docs/e2e-playbook.md docs/architecture.md` returns nothing. The only expected matches elsewhere are config code that runs a command, such as `webServer.command` in the setup section of `docs/testing.md`. A preserved `DESIGN.md` or `docs/architecture.md` from an older template version may still name one; report it instead of rewriting those files.
 - The `design-lint` command from the Toolchain block reports no errors (the empty skeleton passes).
 - Symlink: `ls -la .claude/skills` points to `../.agents/skills`.
-- Every `.codex/agents/*.toml` parses (balanced `"""`, quoted strings).
+- Every `.codex/agents/*.toml` parses (balanced `"""`, quoted strings), and `lighthouserc.json` parses as JSON.
 - If Playwright is configured: the `e2e` command with `--list` lists specs without starting the server. Report specs without a module tag (`@<module>`) as a follow-up; do not tag them during the apply.
 - If a unit runner is configured: run one existing test file with the `test-file` command.
 - If a type check exists: the `typecheck` command.
@@ -145,4 +147,4 @@ In the response language, state:
 - Files written, replaced, merged, and left untouched, with the reason for each exception.
 - Paragraphs moved to the project-specific area or `docs/context/`, and anything dropped.
 - Checks run with their outcome, and checks skipped with the reason.
-- Follow-ups the user may want: migrate the package manager when the choice differs from the detected one (step 4), install test tooling (see the stack file's `testing-setup`), fill `DESIGN.md`, fill `docs/architecture.md`, open a new agent session so the new skills and profiles load.
+- Follow-ups the user may want: migrate the package manager when the choice differs from the detected one (step 4), install test tooling (see the stack file's `testing-setup`), run `lighthouse` once for a baseline of the key routes, fill `DESIGN.md`, fill `docs/architecture.md`, open a new agent session so the new skills and profiles load.

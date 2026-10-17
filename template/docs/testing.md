@@ -37,6 +37,7 @@ The exact commands are defined once, in the Toolchain section of `AGENTS.md`. Th
 | Specs of a touched module | `e2e` with `--grep "@<module>"` |
 | Only the specs that failed last run | `e2e` with `--last-failed` |
 | Level 2 run against a production build | `e2e-prod` with the level 2 selection |
+| Lighthouse scores of the key routes | `lighthouse` after a production build, then `node .agents/skills/web-performance/scripts/lighthouse-audits.mjs` |
 | One mobile spec | `e2e` with `--project=mobile {{E2E_DIR}}/<flow>.mobile.spec.ts` |
 | Debug an E2E spec | `e2e` with `--debug {{E2E_DIR}}/<flow>.spec.ts` |
 | Open a failure trace | `e2e-trace` with `<test-results>/<run>/trace.zip` |

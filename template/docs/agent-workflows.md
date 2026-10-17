@@ -35,6 +35,7 @@ The stronger model goes to work with coupled correctness constraints (business l
 | `e2e-playwright`       | Writing, debugging, or stabilizing E2E specs, or verifying a flow in a browser.                  |
 | `ui-accessibility`     | Changing screens, components, layout, styling, copy, or accessibility.                           |
 | `mobile-ux`            | Auditing and improving the mobile and responsive experience of existing screens or flows.        |
+| `web-performance`      | Measuring and improving Lighthouse scores, or changes that risk them.                            |
 | `release-verification` | Reviewing regressions, verifying a finished change, or an explicitly requested full run/deploy.  |
 
 ## Orchestration rules
