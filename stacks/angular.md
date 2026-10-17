@@ -11,10 +11,12 @@ Snippets for `{{STACK:<name>}}` markers. Based on an Angular 20 CLI application 
 | `{{STYLE_TOKENS_FILE}}` | `src/styles.scss` (verify; may be `src/assets/scss/` in template-based apps) |
 | `{{E2E_DIR}}` / `{{E2E_CONFIG}}` | `e2e/tests` / `e2e/playwright.config.ts` |
 | `{{CMD_DEV}}` / `{{CMD_BUILD}}` | `{{RUN:start}}` / `{{RUN:build}}` |
-| `{{CMD_LINT}}` / `{{CMD_TYPECHECK}}` | `{{RUN:lint}}` / `{{EXEC:tsc --noEmit -p tsconfig.app.json}}` (verify the tsconfig name) |
+| `{{CMD_LINT}}` / `{{CMD_TYPECHECK}}` | `{{RUN:lint}}` / `{{EXEC:tsc --noEmit --incremental -p tsconfig.app.json}}` (verify the tsconfig name) |
 | `{{CMD_TEST}}` | `{{RUN:test --watch=false --browsers=ChromeHeadless}}` |
 | `{{CMD_TEST_WATCH}}` | `{{RUN:test}}` |
 | `{{CMD_TEST_FILE}}` | `{{RUN:test --watch=false --browsers=ChromeHeadless --include=<file>}}` |
+| `{{CMD_TEST_RELATED}}` | `{{RUN:test --watch=false --browsers=ChromeHeadless --include=<spec> --include=<spec>}}` with the specs of the touched files and of the files that import them (Karma has no import-graph mode) |
+| `{{CMD_LINT_FILES}}` | `{{EXEC:eslint --cache <files>}}` (verify the project uses `angular-eslint` with an ESLint config) |
 | `{{CMD_E2E}}` | `{{EXEC:playwright test --config=e2e/playwright.config.ts}}` |
 
 ### toolchain
@@ -82,7 +84,7 @@ flowchart LR
 
 Unit tests are configured by Angular CLI: `angular.json` target `test` (`karmaConfig`, `include: ["src/**/*.spec.ts"]`), `karma.conf.js`, `src/test.ts`, and `src/tsconfig.spec.json` with `"types": ["jasmine", "node"]`.
 
-Run them with the `test` (full suite, headless), `test-file` (for example `src/app/x.spec.ts`), and `test-watch` commands from the Toolchain section of `AGENTS.md`.
+Run them with the `test` (full suite, headless), `test-file` (for example `src/app/x.spec.ts`), and `test-watch` commands from the Toolchain section of `AGENTS.md`. Karma cannot follow imports, so `test-related` takes explicit specs: the touched files' own `*.spec.ts` plus the specs of the files that import them (`grep -rl "<file name>" src/app --include=*.ts`).
 
 Common failures and fixes:
 
@@ -101,6 +103,7 @@ config({ path: `${__dirname}/.env` }); // credentials and base URL; never commit
 
 const BASE_URL = process.env.E2E_BASE_URL ?? 'http://localhost:4200';
 const isRemote = Boolean(process.env.E2E_BASE_URL);
+const PROD = Boolean(process.env.CI || process.env.E2E_PROD);
 
 export default defineConfig({
   testDir: './tests',
@@ -122,15 +125,16 @@ export default defineConfig({
   webServer: isRemote
     ? undefined
     : {
-        command: '{{EXEC:ng serve}}', // no -o: do not open a browser
+        // Iteration uses the dev configuration; e2e-prod and CI serve the production one. No -o: do not open a browser.
+        command: PROD ? '{{EXEC:ng serve --configuration production}}' : '{{EXEC:ng serve}}',
         port: 4200,
-        reuseExistingServer: true, // ng serve's first compile is slow; see note below
-        timeout: 120_000,
+        reuseExistingServer: !PROD, // ng serve's first compile is slow; see note below
+        timeout: PROD ? 300_000 : 120_000,
       },
 });
 ```
 
-Note on `reuseExistingServer`: the template rule prefers `false` so a stale server is never tested. `ng build` plus a static server makes each run slow, so Angular projects usually keep `ng serve` with `reuseExistingServer: true`. If the project does, write that in `docs/testing.md` and restart `ng serve` before trusting a green run after code changes.
+Note on `reuseExistingServer`: the template rule prefers `false` so a stale server is never tested. The first `ng serve` compile is slow, so Angular projects usually reuse a running dev server while iterating; `ng serve` rebuilds on change, but restart it after config or dependency changes before trusting a green run. `e2e-prod` and CI never reuse a server.
 
 `e2e/global-setup.ts` validates required env vars: throw in CI, warn locally so `--list` works without secrets. `e2e/.env.example` documents each variable, its default, and what is skipped when it is missing.
 
@@ -146,7 +150,7 @@ Note on `reuseExistingServer`: the template rule prefers `false` so a stale serv
 }
 ```
 
-`.gitignore` additions: `e2e/test-results/`, `e2e/playwright-report/`, `playwright/.cache/`, `e2e/.env`, `.playwright-mcp/`.
+`.gitignore` additions: `*.tsbuildinfo`, `.eslintcache`, `e2e/test-results/`, `e2e/playwright-report/`, `playwright/.cache/`, `e2e/.env`, `.playwright-mcp/`.
 
 ### e2e-gotchas
 

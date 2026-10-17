@@ -1,18 +1,6 @@
 # Testing and TDD
 
-`AGENTS.md` holds the binding TDD policy. This file explains how to apply it in this repository: the test layers, their configuration, and the commands.
-
-## TDD loop
-
-1. **Define the behavior** in one or two sentences, in terms a user or caller can observe.
-2. **Red:** write or update the smallest test that expresses it. Run only that test and confirm it fails for the expected reason (an assertion, not a typo or a missing import).
-3. **Green:** implement the minimum change that makes it pass.
-4. **Refactor** with the test green. Do not add behavior during this step.
-5. **Re-run** the focused scope, then typecheck the touched code.
-
-For bug fixes, the red step reproduces the bug. Keep the test after the fix.
-
-If a task is test-ineligible (docs, formatting, mechanical rename, initial configuration), say so in the report and name the alternative validation.
+`AGENTS.md` holds the binding TDD policy and the test selection ladder, and the `tdd-change` skill holds the step-by-step loop. This file covers what is specific to this repository: the test layers, their configuration, and which command to use for each goal.
 
 ## Choosing the layer
 
@@ -39,11 +27,16 @@ The exact commands are defined once, in the Toolchain section of `AGENTS.md`. Th
 | --- | --- |
 | One unit test file | `test-file` |
 | TDD loop | `test-watch` |
+| Unit tests that cover the touched files | `test-related` with the files |
 | All unit and component tests | `test` |
-| Type check and lint | `typecheck`, `lint` |
+| Lint touched files, type check | `lint-files` with the files, `typecheck` |
 | Discover E2E specs without starting the server | `e2e` with `--list` |
 | One E2E spec | `e2e` with `{{E2E_DIR}}/<flow>.spec.ts` |
 | One E2E test by title | `e2e` with `--grep "<title>"` |
+| Specs changed since the last commit, and their page objects and helpers | `e2e` with `--only-changed` |
+| Specs of a touched module | `e2e` with `--grep "@<module>"` |
+| Only the specs that failed last run | `e2e` with `--last-failed` |
+| Final run against a production build | `e2e-prod` with the same selection |
 | One mobile spec | `e2e` with `--project=mobile {{E2E_DIR}}/<flow>.mobile.spec.ts` |
 | Debug an E2E spec | `e2e` with `--debug {{E2E_DIR}}/<flow>.spec.ts` |
 | Open a failure trace | `e2e-trace` with `<test-results>/<run>/trace.zip` |

@@ -39,16 +39,19 @@ The stronger model goes to work with coupled correctness constraints (business l
 
 ## Orchestration rules
 
-- Delegate only bounded, independent work when it improves the result. Prefer parallel read-only searches or reviews before parallel implementation.
-- Give every edited file a single owner. The primary thread integrates the changes, runs validation, and reports.
-- A typical feature: `feature-developer` (TDD on the service) → `product-ui` (component) → `e2e-engineer` (one focused spec, if the flow needs it) → `quality-reviewer` on the integrated diff → `verification-runner` for focused checks.
+The binding policy is the Agent orchestration section of `AGENTS.md`: the primary thread works alone by default and delegates only when parallel work finishes sooner and integrates quickly. How that plays out:
+
+- Small task (a few edits, one layer): the primary thread does it alone. No profile is used.
+- Broad investigation across separate areas: up to 3 read-only searches in parallel, then the primary thread decides.
+- Large feature across layers: the primary thread first fixes the contract (types, route, props). Then `feature-developer` (service) and `product-ui` (component) work in parallel on disjoint files, and `e2e-engineer` joins only if the flow needs a spec. The primary thread integrates and runs the level 2 test selection once.
+- Review of a finished diff: `quality-reviewer` and `verification-runner` in parallel, both read-only on product source.
 - Profiles and skills never override the user's current instructions, especially on deployment, running the complete E2E suite, adding dependencies, or using paid providers.
 
 ## Context for every agent
 
 - `AGENTS.md`: binding rules (communication, toolchain, architecture, TDD, E2E, validation). Its Toolchain section is the only source for the runtime, the package manager, and the exact commands that skills and profiles name.
 - `docs/architecture.md`: structure, layers, and boundaries.
-- `docs/testing.md`: TDD loop, test layers, setup, and commands.
+- `docs/testing.md`: test layers, setup, and which command to use for each goal.
 - `docs/e2e-playbook.md`: Playwright patterns, anti-flake rules, and failure signatures.
 - `DESIGN.md`: design tokens, component rules, and accessibility checks for UI work.
 - {{FRAMEWORK_DOCS}}: the framework documentation for the installed version. Read before using a framework API.

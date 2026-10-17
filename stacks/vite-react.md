@@ -11,8 +11,9 @@ Snippets for `{{STACK:<name>}}` markers. Based on a Vite + React single-page app
 | `{{STYLE_TOKENS_FILE}}` | `src/index.css` (verify; may be a theme file such as `src/theme.ts`) |
 | `{{E2E_DIR}}` / `{{E2E_CONFIG}}` | `e2e/tests` / `e2e/playwright.config.ts` |
 | `{{CMD_DEV}}` / `{{CMD_BUILD}}` | `{{RUN:dev}}` / `{{RUN:build}}` |
-| `{{CMD_LINT}}` / `{{CMD_TYPECHECK}}` | `{{RUN:lint}}` / `{{EXEC:tsc --noEmit}}` (or `n/a` in a JavaScript project) |
+| `{{CMD_LINT}}` / `{{CMD_TYPECHECK}}` | `{{RUN:lint}}` / `{{EXEC:tsc --noEmit --incremental}}` (verify: `{{EXEC:tsc -b}}` with project references; `n/a` in a JavaScript project) |
 | `{{CMD_TEST}}` / `{{CMD_TEST_WATCH}}` / `{{CMD_TEST_FILE}}` | `{{EXEC:vitest run}}` / `{{RUN:test}}` / `{{EXEC:vitest run <file>}}` |
+| `{{CMD_TEST_RELATED}}` / `{{CMD_LINT_FILES}}` | `{{EXEC:vitest related --run <files>}}` / `{{EXEC:eslint --cache <files>}}` |
 | `{{CMD_E2E}}` | `{{EXEC:playwright test --config=e2e/playwright.config.ts}}` |
 
 ### toolchain
@@ -111,6 +112,7 @@ config({ path: '.env' }); // Playwright runs from the repo root
 const PORT = 4173;
 const BASE_URL = process.env.VITE_E2E_BASE_URL ?? `http://localhost:${PORT}`;
 const isRemote = Boolean(process.env.VITE_E2E_BASE_URL);
+const PROD = Boolean(process.env.CI || process.env.E2E_PROD);
 
 export default defineConfig({
   testDir: './tests',
@@ -128,15 +130,18 @@ export default defineConfig({
   webServer: isRemote
     ? undefined
     : {
-        command: `{{RUN:build}} && {{RUN:preview --port ${PORT} --strictPort}}`,
+        // Iteration runs against the dev server; e2e-prod and CI against the production build.
+        command: PROD
+          ? `{{RUN:build}} && {{RUN:preview --port ${PORT} --strictPort}}`
+          : `{{RUN:dev --port ${PORT} --strictPort}}`,
         port: PORT,
         reuseExistingServer: false,
-        timeout: 120_000,
+        timeout: PROD ? 120_000 : 60_000,
       },
 });
 ```
 
-`vite preview` serves the production build, so a run never tests a stale dev server. Set `VITE_E2E_BASE_URL` to point the same specs at a deployed environment. Specs that run against a shared backend with real data should set `workers: 1` and avoid parallelism.
+Iteration runs against the Vite dev server; `e2e-prod` and CI build and serve with `vite preview`. With `reuseExistingServer: false`, neither ever tests a stale server. Set `VITE_E2E_BASE_URL` to point the same specs at a deployed environment. Specs that run against a shared backend with real data should set `workers: 1` and avoid parallelism.
 
 `package.json` scripts:
 
@@ -151,7 +156,7 @@ export default defineConfig({
 }
 ```
 
-`.gitignore` additions: `e2e/test-results/`, `e2e/playwright-report/`, `playwright/.cache/`, `e2e/.env`.
+`.gitignore` additions: `*.tsbuildinfo`, `.eslintcache`, `e2e/test-results/`, `e2e/playwright-report/`, `playwright/.cache/`, `e2e/.env`.
 
 ### e2e-gotchas
 

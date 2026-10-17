@@ -5,8 +5,8 @@ description: Use for regression review, release readiness, verifying a finished 
 
 # Verification and release workflow
 
-1. Read `AGENTS.md` and `docs/testing.md`, then inspect the current diff (`git status`, `git diff`). Select checks from the changed files: focused unit test files (`test-file`), focused Playwright specs (`e2e` with the spec path), `typecheck`, `lint`, and `build` only when integration or production behavior matters. Commands named below (`test-file`, `e2e`, ...) are defined in the Toolchain section of `AGENTS.md`.
-2. Run checks with the runtime and package manager from the Toolchain section of `AGENTS.md`. If a script or test layer does not exist yet, say so instead of inventing a substitute.
-3. Run the complete E2E suite only when the current user request explicitly asks for it. Never use real secrets or paid providers in tests.
+1. `AGENTS.md` is already in context; do not re-read it. Commands named below are defined in its Toolchain section. Inspect the current diff (`git status`, `git diff`) and list the touched source files, specs, and modules.
+2. Select checks with the test selection ladder from level 2: `test-related` with the touched files, `e2e --only-changed` plus `--grep "@<module>"` per touched module, `lint-files`, and `typecheck`. Use `build` only when integration or production behavior matters, and `e2e-prod` for the final E2E run. If a script or test layer does not exist yet, say so instead of inventing a substitute.
+3. Run level 4 (the complete unit suite or E2E suite) only when the current user request explicitly asks for it, or for unit tests when test config or dependencies changed. Never use real secrets or paid providers in tests.
 4. If deployment is explicitly requested for the current work, confirm the production build passes, required environment variables are documented in `.env.example`, and no local secrets or tooling files ship. Deploy only after those checks, then verify the deployed URL and the changed routes.
-5. Before attributing a failure to the current change, check whether it also fails without it. Report the exact commands, outcomes, failure locations, skipped checks, and the practical limits of what was verified. Do not stage or commit anything.
+5. Before attributing a failure to the current change, check whether it also fails without it. Report the exact commands, the ladder level reached, outcomes, failure locations, skipped checks, and the practical limits of what was verified. Do not stage or commit anything.

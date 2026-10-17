@@ -25,7 +25,8 @@ A more specific `AGENTS.md` in a subdirectory takes precedence for its scope.
 - Do not rewrite, rename, move, or reformat unrelated code.
 - Preserve existing patterns and style; prefer repository conventions over personal preference.
 - Prefer simple, maintainable solutions over clever ones. No speculative refactors or broad refactors unless requested.
-- Questions go at the start of the task (see Requirements). While executing, do not stop to ask: infer the most reasonable option from the agreed requirement, the repository structure, and existing patterns, and state the assumption in the report.
+- Questions, when the task needs them, go at the start (see Requirements). While executing, do not stop to ask: infer the most reasonable option from the requirement, the repository structure, and existing patterns, and state the assumption in the report.
+- Do not re-read a file that is already in context, and read only the sections of a doc that the task needs.
 - Do not introduce dependencies without a concrete, justified need.
 - Treat existing uncommitted changes as the user's work. Do not revert, absorb, or rewrite them unless told to.
 - Do not stage, unstage, commit, or otherwise modify the Git staging area unless the user explicitly asks.
@@ -55,7 +56,7 @@ Examples: `feat(catalog): add genre filter to the list`, `fix(auth): keep sessio
 All project documentation lives in `docs/`. Only `AGENTS.md`, `CLAUDE.md`, `DESIGN.md`, and `README.md` stay at the root.
 
 - `docs/architecture.md` — structure, layers, boundaries, and which test layer covers what.
-- `docs/testing.md` — TDD loop, test layers, setup, and commands.
+- `docs/testing.md` — test layers, setup, and which command to use for each goal.
 - `docs/e2e-playbook.md` — Playwright patterns, anti-flake rules, failure signatures, spec checklist.
 - `docs/agent-workflows.md` — agent profiles and skills for Claude Code and Codex.
 - `docs/context/` — short notes on feature decisions and non-obvious bug causes (problem, cause, decision, expected behavior), each starting with its date and scope. Create the folder with the first note.
@@ -108,7 +109,10 @@ Adding a dependency still needs a justified need (see Working style).
 | `test` | `{{CMD_TEST}}` | Unit and component tests, single run |
 | `test-watch` | `{{CMD_TEST_WATCH}}` | Unit tests in watch mode (TDD loop) |
 | `test-file` | `{{CMD_TEST_FILE}}` | One unit test file |
-| `e2e` | `{{CMD_E2E}}` | Playwright; append a spec path, `--list`, `--grep "<title>"`, or `--debug` |
+| `test-related` | `{{CMD_TEST_RELATED}}` | Unit tests that cover the given source files |
+| `lint-files` | `{{CMD_LINT_FILES}}` | Lint only the given files, with cache |
+| `e2e` | `{{CMD_E2E}}` | Playwright against the dev server; append a spec path, `--list`, `--grep "<title or @tag>"`, `--only-changed`, `--last-failed`, `-x`, or `--debug` |
+| `e2e-prod` | `E2E_PROD=1 {{CMD_E2E}}` | Playwright against a production build: final validation and CI (CI sets it through `CI`) |
 | `e2e-install` | `{{EXEC:playwright install chromium}}` | Playwright browser, once per machine |
 | `e2e-trace` | `{{EXEC:playwright show-trace <trace.zip>}}` | Open a Playwright trace |
 | `design-lint` | `{{DLX:@google/design.md lint DESIGN.md}}` | Validate `DESIGN.md` |
@@ -149,93 +153,70 @@ Index files: do not add barrel files by default. Use one `index.ts` at a module 
 <!-- BEGIN:agent-rules:requirements -->
 ## Requirements
 
-Every task starts by defining the requirement with the user, so the rest of the task runs without further input.
+Size the requirement round to the task, so the rest of it runs without further input. When unsure between two sizes, take the larger.
 
-1. Read the request and the relevant code first, so the questions cover only what the repository cannot answer.
-2. Ask everything that is open in one message, before planning or editing: scope, expected behavior, edge cases, acceptance criteria, constraints. Propose an inferred default for each question so the user can confirm quickly. If nothing is open, state the requirement as understood and proceed.
-3. Record the agreed requirement as a short list of observable behaviors. It is the input to step 1 of Planning.
-4. After that, do not ask again. Resolve new doubts from the agreed requirement and the repository patterns, and state each assumption in the report. Anything that would need a new decision from the user (a deployment, a new dependency, a destructive action, a change of scope) is left out of the change and reported as a follow-up.
+- **Trivial** (a typo, a copy edit, a one-file fix with an obvious expected result): do it without asking.
+- **Small** (a clear request with one reasonable interpretation): state the requirement and any assumption in one or two lines, then proceed without waiting.
+- **Medium or ambiguous** (several behaviors, more than one reasonable interpretation, or a change to public behavior): read the request and the relevant code first, then ask everything open in one message (scope, expected behavior, edge cases, acceptance criteria, constraints), each with a proposed default.
+
+The requirement is a short list of observable behaviors and the input to planning. After it, do not ask again: resolve doubts from the requirement and the repository patterns, and state each assumption in the report. Anything that needs a new decision from the user (a deployment, a new dependency, a destructive action, a change of scope) stays out of the change and is reported as a follow-up.
 <!-- END:agent-rules:requirements -->
 
-<!-- BEGIN:agent-rules:planning -->
-## Planning
-
-Break every request into small tasks before implementing. Derive them from the agreed requirement (see Requirements): one task per observable behavior, in dependency order. Each task has a defined check that proves it is done: a test that goes from red to green, or, for a test-ineligible task (see TDD policy), a named alternative such as typecheck, lint, `--list`, or inspection. If a task has no check, split or merge it until it has one; do not split further than that.
-
-Each task with a behavior change follows TDD. Its plan is:
-
-1. Define the expected behavior, from the agreed requirement (see Requirements).
-2. Add or update a failing test.
-3. Implement the minimum change that makes it pass.
-4. Run the relevant tests.
-5. Refactor only if needed, then re-run them.
-
-A plan must not jump straight to implementation unless the task is test-ineligible, and then it says why. Keep plans short, concrete, and low-risk.
-<!-- END:agent-rules:planning -->
 
 <!-- BEGIN:agent-rules:tdd -->
-## TDD policy
+## Planning and TDD
 
-TDD is mandatory for every behavior change, bug fix, or new feature:
+Break the requirement into small tasks, one per observable behavior, in dependency order. Each task has one check that proves it is done: a test that goes from red to green or, for a test-ineligible task, a named alternative (typecheck, lint, `--list`, inspection). Split or merge tasks until each has a check, and no further. A trivial task is a single task and needs no written plan.
 
-1. Write a new failing test, or update an existing one so it fails against current behavior. Run it and confirm it fails for the expected reason.
+TDD is mandatory for every behavior change, bug fix, or new feature. Implementing first and adding tests later is not allowed:
+
+1. Write a failing test, or update one so it fails against current behavior; for a bug, the test reproduces it. Run it and confirm it fails for the expected reason.
 2. Implement the smallest change that makes it pass.
-3. Refactor only after it passes.
-4. Re-run the relevant test scope to confirm the final result.
+3. Refactor only with the test green.
+4. Confirm through the test selection ladder (see Validation).
 
-Do not implement first and add tests later. "Include tests when possible" is not enough; the default is test-first.
-
-For bug fixes, the failing test reproduces the bug first.
-
-Test-ineligible tasks:
-
-- Purely mechanical renames with no behavior change
-- Comment-only or documentation-only edits
-- Formatting-only changes
-- Initial configuration or infrastructure where no automated test layer exists yet
-
-When TDD is skipped, state why it was not feasible and what alternative validation was used (inspection, typecheck, lint, manual run).
+Test-ineligible: mechanical renames with no behavior change, comment-only or documentation-only edits, formatting-only changes, and initial configuration where no automated test layer exists yet. When TDD is skipped, state why and what validated the change instead.
 
 ### Test layers
 
 {{STACK:test-layers}}
-Setup, configuration, and commands are in `docs/testing.md`.
+Setup and configuration are in `docs/testing.md`; the step-by-step loop is the `tdd-change` skill.
 <!-- END:agent-rules:tdd -->
 
 <!-- BEGIN:agent-rules:e2e -->
 ## E2E policy (Playwright)
 
-Patterns and diagnosis are in `docs/e2e-playbook.md`; these rules are binding.
+These rules are binding; patterns, examples, and diagnosis are in `docs/e2e-playbook.md`.
 
-- Test user-visible behavior, not implementation details.
-- Do not run the complete E2E suite unless the user explicitly requests it. Run only the specs relevant to the change.
-- Prefer isolated, independent tests. Use `test.describe.serial` only for true journeys where each step depends on the previous step's state.
-- Do not add a test that only asserts a transient route hop when the next functional test already covers that transition.
-- Locator priority: `getByRole` with accessible name → `getByLabel` → `getByTestId` → scoped CSS as last resort. Avoid selectors that match multiple elements in strict mode.
-- Use deterministic waits (`expect(...)` auto-retrying assertions, `waitForURL`, explicit state checks). Never use `waitForTimeout` for synchronization.
-- Assert destination URLs exactly. Validate readiness, not just presence: the expected value is visible and the CTA is enabled before acting.
-- Real app behavior first. Mock only external, non-deterministic boundaries (third-party providers, payments, email) for a concrete technical reason, never as a replacement for core product behavior.
-- To assert a specific error state, walk the real path that produces it instead of sending synthetic invalid input that fails at a different layer.
-- Generate unique test data at runtime (timestamp/random suffix); keep static fixtures only for non-unique values. Retry only known recoverable conflicts, bounded to 3–5 attempts, and fail with the current URL and reason.
-- Let Playwright own the app server (`webServer` in `{{E2E_CONFIG}}`) on a dedicated port with `reuseExistingServer: false`, so a stale server is never tested. Use test-only environment values and fake providers; see `docs/testing.md` for this stack's command.
-- Keep traces and screenshots on failure (`trace: 'retain-on-failure'`, `screenshot: 'only-on-failure'`). Diagnose with the trace viewer first.
-- Put shared helpers in `{{E2E_DIR}}/helpers/` and page objects (one per page, with an `assertLoaded` method) in `{{E2E_DIR}}/pages/`. Extract a config detail into a helper once it repeats in three or more specs.
-- When a flow changes, update the spec, its page objects/helpers, and any flow documentation in the same change.
-
-E2E validation order:
-
-1. The `e2e` command with `--list` after structural edits.
-2. The `e2e` command with the changed spec (`{{E2E_DIR}}/<flow>.spec.ts`) or `--grep "<title>"`.
-3. The full flow or suite only when coupling risk exists and the user asked for it.
+- Test user-visible behavior with isolated tests. Use `test.describe.serial` only for true journeys where each step depends on the previous one. Do not add a test that only asserts a transient route hop the next test already covers.
+- Locators: `getByRole` with accessible name → `getByLabel` → `getByTestId` → scoped CSS as last resort. No locator may match several elements in strict mode.
+- Use deterministic waits only (auto-retrying `expect`, `waitForURL`, explicit state checks); never `waitForTimeout`. Assert exact destination URLs and readiness (expected value visible, CTA enabled) before acting.
+- Real app behavior first. Mock only external, non-deterministic boundaries (third-party providers, payments, email) for a concrete reason. Reach a specific error state through the real path that produces it.
+- Generate unique test data at runtime. Retry only known recoverable conflicts, 3–5 attempts, failing with the current URL and reason.
+- Playwright owns the app server (`webServer` in `{{E2E_CONFIG}}`, dedicated port, `reuseExistingServer: false`): the dev server while iterating, a production build through `e2e-prod` for the final run and CI. Use test-only environment values and fake providers, never real secrets.
+- Every spec is tagged with the module it covers (`{ tag: '@<module>' }`, where the module is the feature folder name), so a changed source file maps to its specs without a lookup table.
+- Keep traces and screenshots on failure, and diagnose from the trace before touching a timeout.
+- Page objects (one per page, with `assertLoaded()`) live in `{{E2E_DIR}}/pages/` and shared helpers in `{{E2E_DIR}}/helpers/`. A changed flow updates its spec, page objects, helpers, and flow docs in the same change.
+- Never run the complete E2E suite unless the user explicitly asks for it. Select specs with the ladder in Validation.
 <!-- END:agent-rules:e2e -->
 
 <!-- BEGIN:agent-rules:validation -->
-## Validation
+## Validation and test selection
 
-- Always validate the change, using the smallest relevant scope.
-- Priority: relevant automated tests → focused typecheck/lint of touched code → manual verification only when necessary.
-- Do not run unrelated checks. Do not run the `build` command by default; use it only when the user asks, or when integration or production behavior cannot be validated otherwise.
-- If a command cannot be run, say so and state what should be run manually.
+Validate every change with the smallest scope that proves it. Climb one level only when the previous one is green, and stop at the first level that covers the change.
+
+| Level | When | Unit | E2E |
+| --- | --- | --- | --- |
+| 1. Focused | While iterating on a task | `test-file` with the test being written | `e2e` with the spec, `--grep "<title>"`, and `-x` |
+| 2. Related | Once the tasks are green, before reporting | `test-related` with the touched source files | `e2e --only-changed` (changed specs, page objects, helpers) plus `--grep "@<module>"` for each touched module |
+| 3. Failed | After fixing failures found at level 2 | the failing test files | `e2e --last-failed` |
+| 4. Full | Only on explicit request; for unit tests also when test config, dependencies, or a module imported almost everywhere changed | `test` | the complete `e2e`, only on explicit request |
+
+- E2E levels 1–3 run against the dev server. The last E2E run before reporting repeats the level 2 selection with `e2e-prod`.
+- Skip what the change cannot affect: documentation-only changes run no tests; style-only changes run no unit tests and are inspected instead; a test-only change runs only that test.
+- Run `lint-files` on the touched files and `typecheck` once per task, not after every edit. Do not re-run a green check unless the code it covers changed since.
+- Do not run the `build` command unless the user asks, or production behavior cannot be validated otherwise (`e2e-prod` already covers E2E).
+- If a command cannot be run, say so and state what should be run manually. Report the level reached and why higher levels were not needed.
 <!-- END:agent-rules:validation -->
 
 <!-- BEGIN:agent-rules:orchestration -->
@@ -243,10 +224,19 @@ E2E validation order:
 
 Profiles and skills are described in `docs/agent-workflows.md`. Skills live in `.agents/skills/` (shared with Claude Code through the `.claude/skills` symlink); profiles live in `.claude/agents/` and `.codex/agents/` and must stay in sync.
 
-- The primary thread owns the full user request, the constraints in this file, integration, validation, and the final report.
-- Delegate only bounded, independent work when it improves the result. Prefer parallel read-only searches or reviews; assign one owner per edited file.
-- Delegated agents follow this file and never override the user's instructions on deployment or running the full E2E suite.
-- Delegated agents do not ask the user. They work from the agreed requirement and return open questions to the primary thread.
+The primary thread owns the full request, the constraints in this file, integration, validation, and the final report, and works alone by default. Extra agents exist only to finish sooner: spending more tokens is acceptable when it shortens the time to a validated result, never otherwise.
+
+Delegate only when all three hold:
+
+1. The work splits into parts with no shared files and no ordering dependency (for example, read-only exploration of separate areas, or a service and its UI once the contract between them is fixed).
+2. Each part is large enough that running in parallel saves more time than briefing and integrating it costs. Work the primary thread can finish in a few edits is never delegated.
+3. Integrating and validating the results is quick: disjoint files, an interface agreed before splitting, and a focused check per part.
+
+- Use the fewest agents that cover the independent parts, at most 3 at once, launched together.
+- Each brief is self-contained: goal, files owned, the agreed contract, the checks to run, what not to touch, and what to return (changed files, commands run, results, open questions).
+- Do not delegate sequential steps, edits to the same file, decisions the other parts depend on (settle those first in the primary thread), or work that needs the user.
+- Delegated agents follow this file, never override the user's instructions on deployment or the full E2E suite, do not ask the user, and return open questions to the primary thread.
+- After integrating, the primary thread runs the level 2 selection (see Validation) once on the combined diff.
 <!-- END:agent-rules:orchestration -->
 
 <!-- Project-specific rules go below this line (domain invariants, terminology, environments, safety rules). They are preserved when the template is re-applied. -->

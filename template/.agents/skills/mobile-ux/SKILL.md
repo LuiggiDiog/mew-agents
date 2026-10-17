@@ -5,12 +5,12 @@ description: Use to audit and improve the mobile and responsive experience of ex
 
 # Mobile UX workflow
 
-1. Read `AGENTS.md` (Design and UI rules), `DESIGN.md` (Layout, Responsive behavior, Responsive verification, Shapes), and the Mobile checks section of `docs/e2e-playbook.md`. Commands named below (`e2e`, `typecheck`, ...) are defined in the Toolchain section of `AGENTS.md`. Read the framework documentation for the installed version ({{FRAMEWORK_DOCS}}) before changing framework behavior (viewport metadata, layouts, images, fonts).
+1. `AGENTS.md` is already in context; do not re-read it. Commands named below are defined in its Toolchain section. Read `DESIGN.md` (Layout, Responsive behavior, Responsive verification, Shapes) and, when writing a mobile spec, the Mobile checks section of `docs/e2e-playbook.md`. Read the framework documentation for the installed version ({{FRAMEWORK_DOCS}}) before changing framework behavior (viewport metadata, layouts, images, fonts).
 2. In the requirement round, agree the screens or flows in scope and the widths. Use the widths in `DESIGN.md` Responsive verification; if it lists none, use 320, 375, 768, 1024, and 1440 CSS pixels and propose them there in the same change.
 3. Audit mobile-first: each screen at the smallest width, then up to desktop, against the checklist below. Inspect the code (viewport metadata, styles, components) and, when a browser is available, the rendered screen with touch emulation. Record each finding with file and line, checklist item, width, and priority.
 4. Fix in priority order within the agreed scope, using the existing tokens in `{{STYLE_TOKENS_FILE}}` and existing components. Write base styles for small screens and enhance with `min-width` media queries. When a fix sets a reusable rule (target size, breakpoint behavior, sheet versus dialog), record it in `DESIGN.md` together with the stylesheet. Findings outside the scope or needing a product decision become follow-ups.
 5. Test first where a check can prove the fix: a behavior change gets a component test (`tdd-change`); horizontal overflow and undersized targets get a focused `*.mobile.spec.ts` that fails before the fix, using the helpers in `docs/e2e-playbook.md`. A visual adjustment with no deterministic check is validated by inspection at each width, and the report says so.
-6. Validate with the changed spec (`e2e` with `--project=mobile <spec>`) and `typecheck` and `lint` on touched files, then re-inspect each screen at every agreed width.
+6. Validate with the changed spec (`e2e --project=mobile <spec>` while iterating, `e2e-prod --project=mobile <spec>` as the final run), then `lint-files` and `typecheck` once, then re-inspect each screen at every agreed width.
 7. Report findings by priority with their status (fixed or follow-up), the widths and emulated devices checked, the commands run, and what was not verified (real devices, iOS Safari when only Chromium ran, screen readers).
 
 ## Checklist

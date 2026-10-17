@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.5.0 — 2026-10-17
+
+- `AGENTS.md` `requirements`: the question round scales with the task (trivial: act; small: state the requirement and proceed; medium or ambiguous: one round of questions).
+- `AGENTS.md` `validation`: test selection ladder (focused → related → failed → full). Related unit tests follow the import graph (`test-related`); related E2E specs come from `--only-changed` plus a `@<module>` tag per spec; `--last-failed` after fixes; full suites only on request. Lint and typecheck once per task, with cache.
+- E2E iterates against the dev server; the final run and CI use a production build (`e2e-prod`, driven by `E2E_PROD` or `CI` in `webServer`).
+- `AGENTS.md` `orchestration`: multi-agent policy. The primary thread works alone by default and delegates only when the parts are independent, large enough to save time, and quick to integrate; at most 3 agents at once, with self-contained briefs.
+- `planning` and `tdd` merged into one `tdd` block ("Planning and TDD"); re-applying removes the old `planning` block. `docs/testing.md` and `docs/agent-workflows.md` no longer repeat rules from `AGENTS.md`.
+- Skills and profiles do not re-read `AGENTS.md` and read only the doc sections the task needs.
+- New commands and variables: `test-related` (`{{CMD_TEST_RELATED}}`), `lint-files` (`{{CMD_LINT_FILES}}`), `e2e-prod`. Stacks: incremental typecheck, `.eslintcache` and `*.tsbuildinfo` ignored, dev/production `webServer` switch.
+
 ## 1.4.0 — 2026-10-17
 
 - New skill `mobile-ux`: audits and improves the mobile and responsive experience of existing screens, mobile-first, with a prioritized checklist (touch and access, layout and reflow, navigation and overlays, mobile forms, perceived performance). Reusable rules go to `DESIGN.md`.

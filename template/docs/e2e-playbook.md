@@ -75,6 +75,15 @@ export class HomePage {
 - **Serial only for true journeys.** Use `test.describe.serial` only when each step depends on the previous step's session or state.
 - **No bridge-only tests.** Do not add a test that only asserts a transient redirect when the next functional test already validates it; fold the assertion into that test's preamble.
 - **Assert exact destinations:** `await expect(page).toHaveURL('/exact/path')`.
+- **Tag by module.** Tag each spec with the feature folder it covers, so a change in that folder selects its specs with `--grep "@<module>"`. A spec that crosses modules carries each tag.
+
+```ts
+test.describe('checkout', { tag: '@checkout' }, () => {
+  test('pays with a saved card', async ({ page }) => {
+    // ...
+  });
+});
+```
 
 ## 6. Locators (priority order)
 
@@ -223,9 +232,13 @@ for (const width of [320, 375]) {
 
 ## 13. Validation order
 
-1. The `e2e` command with `--list` after structural edits (commands are in the Toolchain section of `AGENTS.md`).
-2. The `e2e` command with the changed spec or test (`--grep "<title>"`).
-3. The full flow or suite only when coupling risk exists and the user asked for it.
+Follow the test selection ladder in `AGENTS.md` (Validation). For E2E it means:
+
+1. `e2e --list` after structural edits.
+2. While iterating: the changed spec with `--grep "<title>"` and `-x`, against the dev server.
+3. Before reporting: `--only-changed` plus `--grep "@<module>"` for each touched module; after fixing failures, `--last-failed`.
+4. Final run: the same selection with `e2e-prod`, against a production build.
+5. The complete suite only when the user asks for it.
 
 On failure: open the trace first, then capture the URL, visible blockers, and console errors. Document the root cause and fix pattern.
 
@@ -253,5 +266,6 @@ On failure: open the trace first, then capture the URL, visible blockers, and co
 - [ ] Unique runtime data; bounded retries only for known conflicts.
 - [ ] Exact URL assertions; no bridge-only tests.
 - [ ] Flows with a mobile concern have a `*.mobile.spec.ts` with overflow and target checks at the agreed widths.
-- [ ] Validated with `--list`, then the targeted spec.
+- [ ] Tagged with the module it covers (`@<module>`).
+- [ ] Validated with `--list`, then the ladder: targeted spec on the dev server, final run with `e2e-prod`.
 - [ ] Flow docs updated in the same change.

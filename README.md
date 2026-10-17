@@ -40,4 +40,5 @@ The agent discovers the stack, fills the variables, copies or merges the files, 
 - Template files are in English; the response language is a variable.
 - Package-manager agnostic: template and stack files never name a package manager. They use the `{{PM*}}` variables and the `{{RUN:…}}`, `{{EXEC:…}}`, `{{DLX:…}}` forms defined in `APPLY.md`, and in each project only the Toolchain block of `AGENTS.md` holds the resolved commands.
 - Invariant rules live in `template/`; anything that depends on the framework lives in `stacks/` under `### <snippet>` headings that `APPLY.md` maps to `{{STACK:<snippet>}}` markers.
+- Efficiency without losing quality: each rule lives in one place, agents read only what the task needs, tests climb a selection ladder instead of running full suites, and extra agents are used only when they finish the work sooner.
 - Never put domain rules in the template. They belong to each project's own area in `AGENTS.md` and `docs/context/`.
