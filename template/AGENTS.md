@@ -69,17 +69,52 @@ Read the relevant doc before changing that area, and update it in the same chang
 - `DESIGN.md` at the repo root is the design source of truth: tokens, typography, color and contrast, layout and responsive rules, component rules, and accessibility checks. Read it before any UI change and keep it aligned with `{{STYLE_TOKENS_FILE}}`.
 - While `DESIGN.md` is empty or has no rule for the case at hand, follow the existing UI and propose the missing rule in `DESIGN.md` in the same change. Do not invent a parallel convention.
 - When a change introduces a reusable visual rule or token, update `DESIGN.md` and the stylesheet together.
-- `DESIGN.md` follows the Google Labs DESIGN.md format: normative tokens in the YAML frontmatter, prose in fixed `##` sections. After editing it, run `npx @google/design.md lint DESIGN.md` and fix every error. Tokens can be exported with `npx @google/design.md export --format css-tailwind DESIGN.md`.
+- `DESIGN.md` follows the Google Labs DESIGN.md format: normative tokens in the YAML frontmatter, prose in fixed `##` sections. After editing it, run the `design-lint` command and fix every error. Tokens can be exported with the `design-export` command.
 <!-- END:agent-rules:design -->
 
 <!-- BEGIN:agent-rules:toolchain -->
 ## Toolchain
 
+This section is the only place that names the runtime, the package manager, and the exact commands. Skills, agent profiles, and docs refer to commands by the names in the Commands table (for example "the `test-file` command"); resolve them here. To change the package manager or a command, edit only this section, plus any config code that runs a command (such as Playwright's `webServer.command`).
+
 - Runtime: Node.js {{NODE_VERSION}}, pinned in `.nvmrc`. Use that version for installs, scripts, and tests.
-- Package manager: `{{PM}}` (see `packageManager` in `package.json` and the lockfile). Never use another package manager, and never commit another lockfile.
+- Package manager: `{{PM}}`, lockfile `{{PM_LOCKFILE}}`. Use only `{{PM}}` to install, add, run scripts, and run binaries. Never use another package manager, and never commit another lockfile.
 {{STACK:toolchain}}
 - Do not deploy unless the user explicitly asks for a deployment of the current work.
 - Never commit secrets. `.env*` files are git-ignored; document required variables in `.env.example`.
+
+### Package manager
+
+| Action | Command |
+| --- | --- |
+| Install dependencies | `{{PM_INSTALL}}` |
+| Add a dependency | `{{PM_ADD}} <package>` |
+| Add a dev dependency | `{{PM_ADD_DEV}} <package>` |
+| Run a `package.json` script | `{{RUN:<script>}}` |
+| Run a script with arguments | `{{RUN:<script> <args>}}` |
+| Run a locally installed binary | `{{EXEC:<bin> <args>}}` |
+| Run a package without installing it | `{{DLX:<package> <args>}}` |
+
+Adding a dependency still needs a justified need (see Working style).
+
+### Commands
+
+| Name | Command | Runs |
+| --- | --- | --- |
+| `dev` | `{{CMD_DEV}}` | Development server |
+| `build` | `{{CMD_BUILD}}` | Production build |
+| `lint` | `{{CMD_LINT}}` | Lint |
+| `typecheck` | `{{CMD_TYPECHECK}}` | Type check |
+| `test` | `{{CMD_TEST}}` | Unit and component tests, single run |
+| `test-watch` | `{{CMD_TEST_WATCH}}` | Unit tests in watch mode (TDD loop) |
+| `test-file` | `{{CMD_TEST_FILE}}` | One unit test file |
+| `e2e` | `{{CMD_E2E}}` | Playwright; append a spec path, `--list`, `--grep "<title>"`, or `--debug` |
+| `e2e-install` | `{{EXEC:playwright install chromium}}` | Playwright browser, once per machine |
+| `e2e-trace` | `{{EXEC:playwright show-trace <trace.zip>}}` | Open a Playwright trace |
+| `design-lint` | `{{DLX:@google/design.md lint DESIGN.md}}` | Validate `DESIGN.md` |
+| `design-export` | `{{DLX:@google/design.md export --format css-tailwind DESIGN.md}}` | Export `DESIGN.md` tokens as CSS |
+
+Arguments appended to a command (a spec path, `--list`) go after it unchanged, except when the command is a script: then use the "Run a script with arguments" form.
 <!-- END:agent-rules:toolchain -->
 
 <!-- BEGIN:agent-rules:architecture -->
@@ -189,8 +224,8 @@ Patterns and diagnosis are in `docs/e2e-playbook.md`; these rules are binding.
 
 E2E validation order:
 
-1. `{{CMD_E2E}} --list` after structural edits.
-2. The changed spec or step: `{{CMD_E2E}} {{E2E_DIR}}/<flow>.spec.ts` or `--grep "<title>"`.
+1. The `e2e` command with `--list` after structural edits.
+2. The `e2e` command with the changed spec (`{{E2E_DIR}}/<flow>.spec.ts`) or `--grep "<title>"`.
 3. The full flow or suite only when coupling risk exists and the user asked for it.
 <!-- END:agent-rules:e2e -->
 
@@ -199,7 +234,7 @@ E2E validation order:
 
 - Always validate the change, using the smallest relevant scope.
 - Priority: relevant automated tests → focused typecheck/lint of touched code → manual verification only when necessary.
-- Do not run unrelated checks. Do not run `{{CMD_BUILD}}` by default; use it only when the user asks, or when integration or production behavior cannot be validated otherwise.
+- Do not run unrelated checks. Do not run the `build` command by default; use it only when the user asks, or when integration or production behavior cannot be validated otherwise.
 - If a command cannot be run, say so and state what should be run manually.
 <!-- END:agent-rules:validation -->
 

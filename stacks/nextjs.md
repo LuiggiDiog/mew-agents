@@ -1,20 +1,19 @@
 # Stack: Next.js App Router
 
-Snippets for `{{STACK:<name>}}` markers. Each `###` section body replaces the marker with the same name. Based on a Next.js 16 App Router project with React 19, TypeScript, Tailwind CSS v4, Vitest, and Playwright.
+Snippets for `{{STACK:<name>}}` markers. Each `###` section body replaces the marker with the same name. Based on a Next.js 16 App Router project with React 19, TypeScript, Tailwind CSS v4, Vitest, and Playwright. Commands use the `{{RUN:…}}`, `{{EXEC:…}}`, and `{{DLX:…}}` forms from step 3 of `APPLY.md` and never name a package manager; check each script name against `package.json`.
 
 ### profile-defaults
 
 | Variable | Typical value |
 | --- | --- |
-| `{{PM}}` / `{{PM_EXEC}}` | `pnpm` / `pnpm exec` |
 | `{{FRAMEWORK_DOCS}}` | `` `node_modules/next/dist/docs/` `` (the guides for the installed version) |
 | `{{SOURCE_DIR}}` | `` `app/` (routes) and `modules/` (features) `` |
 | `{{STYLE_TOKENS_FILE}}` | `app/globals.css` |
 | `{{E2E_DIR}}` / `{{E2E_CONFIG}}` | `tests/e2e` / `playwright.config.ts` |
-| `{{CMD_DEV}}` / `{{CMD_BUILD}}` | `pnpm dev` / `pnpm build` |
-| `{{CMD_LINT}}` / `{{CMD_TYPECHECK}}` | `pnpm lint` / `pnpm typecheck` |
-| `{{CMD_TEST}}` / `{{CMD_TEST_WATCH}}` / `{{CMD_TEST_FILE}}` | `pnpm test` / `pnpm test:watch` / `pnpm test <file>` |
-| `{{CMD_E2E}}` | `pnpm exec playwright test` |
+| `{{CMD_DEV}}` / `{{CMD_BUILD}}` | `{{RUN:dev}}` / `{{RUN:build}}` |
+| `{{CMD_LINT}}` / `{{CMD_TYPECHECK}}` | `{{RUN:lint}}` / `{{RUN:typecheck}}` |
+| `{{CMD_TEST}}` / `{{CMD_TEST_WATCH}}` / `{{CMD_TEST_FILE}}` | `{{RUN:test}}` / `{{RUN:test:watch}}` / `{{RUN:test <file>}}` |
+| `{{CMD_E2E}}` | `{{EXEC:playwright test}}` |
 
 ### toolchain
 
@@ -97,11 +96,7 @@ flowchart LR
 
 ### testing-setup
 
-Unit and component tests (installed as dev dependencies: `vitest`, `@vitejs/plugin-react`, `jsdom`, `@testing-library/react`, `@testing-library/dom`, `@testing-library/jest-dom`, `@testing-library/user-event`):
-
-```bash
-pnpm add -D vitest @vitejs/plugin-react jsdom @testing-library/react @testing-library/dom @testing-library/jest-dom @testing-library/user-event
-```
+Unit and component tests, installed with the "Add a dev dependency" form from the Toolchain section of `AGENTS.md`: `vitest`, `@vitejs/plugin-react`, `jsdom`, `@testing-library/react`, `@testing-library/dom`, `@testing-library/jest-dom`, `@testing-library/user-event`.
 
 `vitest.config.mts`:
 
@@ -136,7 +131,7 @@ afterEach(() => {
 
 Conventions: query the DOM by role and accessible name, then label, then text, test ID last. Simulate interactions with `@testing-library/user-event`. Node-only tests can declare `// @vitest-environment node`.
 
-End-to-end tests (`@playwright/test` with Chromium; `pnpm exec playwright install chromium` once per machine):
+End-to-end tests (`@playwright/test` with Chromium; run the `e2e-install` command once per machine):
 
 `playwright.config.ts`:
 
@@ -161,7 +156,7 @@ export default defineConfig({
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
     // E2E runs against a production build on a dedicated port.
-    command: `pnpm build && pnpm start --hostname 127.0.0.1 --port ${PORT}`,
+    command: `{{RUN:build}} && {{RUN:start --hostname 127.0.0.1 --port ${PORT}}}`,
     url: BASE_URL,
     reuseExistingServer: false,
     timeout: 180_000,
@@ -172,7 +167,7 @@ export default defineConfig({
 });
 ```
 
-The dedicated port avoids clashing with `pnpm dev` on 3000. Expect the first step of each run to be the build.
+The dedicated port avoids clashing with the `dev` command on 3000. Expect the first step of each run to be the build.
 
 `package.json` scripts and `engines`:
 

@@ -1,20 +1,19 @@
 # Stack: Vite + React (SPA)
 
-Snippets for `{{STACK:<name>}}` markers. Based on a Vite + React single-page app with React Router, Redux, MUI, Vitest, and Playwright under `e2e/`. Values marked "verify" differ between projects; confirm them in step 1 of `APPLY.md`.
+Snippets for `{{STACK:<name>}}` markers. Based on a Vite + React single-page app with React Router, Redux, MUI, Vitest, and Playwright under `e2e/`. Values marked "verify" differ between projects; confirm them in step 1 of `APPLY.md`. Commands use the `{{RUN:…}}`, `{{EXEC:…}}`, and `{{DLX:…}}` forms from step 3 of `APPLY.md` and never name a package manager; check each script name against `package.json`.
 
 ### profile-defaults
 
 | Variable | Typical value |
 | --- | --- |
-| `{{PM}}` / `{{PM_EXEC}}` | `yarn` / `yarn` |
 | `{{FRAMEWORK_DOCS}}` | `https://vite.dev/guide/` and `https://react.dev/reference` (no local copy; match the installed majors in `package.json`) |
 | `{{SOURCE_DIR}}` | `` `src/` `` |
 | `{{STYLE_TOKENS_FILE}}` | `src/index.css` (verify; may be a theme file such as `src/theme.ts`) |
 | `{{E2E_DIR}}` / `{{E2E_CONFIG}}` | `e2e/tests` / `e2e/playwright.config.ts` |
-| `{{CMD_DEV}}` / `{{CMD_BUILD}}` | `yarn dev` / `yarn build` |
-| `{{CMD_LINT}}` / `{{CMD_TYPECHECK}}` | `yarn lint` / `yarn tsc --noEmit` (or `n/a` in a JavaScript project) |
-| `{{CMD_TEST}}` / `{{CMD_TEST_WATCH}}` / `{{CMD_TEST_FILE}}` | `yarn vitest run` / `yarn test` / `yarn vitest run <file>` |
-| `{{CMD_E2E}}` | `yarn playwright test --config=e2e/playwright.config.ts` |
+| `{{CMD_DEV}}` / `{{CMD_BUILD}}` | `{{RUN:dev}}` / `{{RUN:build}}` |
+| `{{CMD_LINT}}` / `{{CMD_TYPECHECK}}` | `{{RUN:lint}}` / `{{EXEC:tsc --noEmit}}` (or `n/a` in a JavaScript project) |
+| `{{CMD_TEST}}` / `{{CMD_TEST_WATCH}}` / `{{CMD_TEST_FILE}}` | `{{EXEC:vitest run}}` / `{{RUN:test}}` / `{{EXEC:vitest run <file>}}` |
+| `{{CMD_E2E}}` | `{{EXEC:playwright test --config=e2e/playwright.config.ts}}` |
 
 ### toolchain
 
@@ -101,7 +100,7 @@ export default defineConfig({
 
 The explicit `include` under `src/` keeps Vitest away from Playwright specs in `e2e/`. `src/setupTests.js` imports `@testing-library/jest-dom/vitest` and calls `cleanup` after each test.
 
-End-to-end tests (`@playwright/test`; `yarn playwright install chromium` once per machine). `e2e/playwright.config.ts`:
+End-to-end tests (`@playwright/test`; run the `e2e-install` command once per machine). `e2e/playwright.config.ts`:
 
 ```ts
 import { defineConfig, devices } from '@playwright/test';
@@ -129,7 +128,7 @@ export default defineConfig({
   webServer: isRemote
     ? undefined
     : {
-        command: `yarn build && yarn preview --port ${PORT} --strictPort`,
+        command: `{{RUN:build}} && {{RUN:preview --port ${PORT} --strictPort}}`,
         port: PORT,
         reuseExistingServer: false,
         timeout: 120_000,

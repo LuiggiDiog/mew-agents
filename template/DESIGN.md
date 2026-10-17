@@ -36,7 +36,7 @@ components: {}
 
 ## Overview
 
-This file is the design source of truth for UI work in this repository. It follows the [Google Labs DESIGN.md format](https://github.com/google-labs-code/design.md): the YAML frontmatter holds exact tokens, and the `##` sections below, in the order the format fixes, explain how to apply them. Tokens are implemented in `{{STYLE_TOKENS_FILE}}`; update this file and the stylesheet together. Validate edits with `npx @google/design.md lint DESIGN.md`; export tokens with `npx @google/design.md export --format css-tailwind DESIGN.md` when the stylesheet should be generated from them.
+This file is the design source of truth for UI work in this repository. It follows the [Google Labs DESIGN.md format](https://github.com/google-labs-code/design.md): the YAML frontmatter holds exact tokens, and the `##` sections below, in the order the format fixes, explain how to apply them. Tokens are implemented in `{{STYLE_TOKENS_FILE}}`; update this file and the stylesheet together. Validate edits with the `design-lint` command; export tokens with the `design-export` command when the stylesheet should be generated from them (both are in the Toolchain section of `AGENTS.md`).
 
 How agents use this file:
 

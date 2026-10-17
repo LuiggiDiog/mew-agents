@@ -148,8 +148,8 @@ Off by default. When a run is meant to be shared with non-engineers:
 
 ## 12. Validation order
 
-1. `{{CMD_E2E}} --list` after structural edits.
-2. The changed spec or test (`--grep "<title>"`).
+1. The `e2e` command with `--list` after structural edits (commands are in the Toolchain section of `AGENTS.md`).
+2. The `e2e` command with the changed spec or test (`--grep "<title>"`).
 3. The full flow or suite only when coupling risk exists and the user asked for it.
 
 On failure: open the trace first, then capture the URL, visible blockers, and console errors. Document the root cause and fix pattern.

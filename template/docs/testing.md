@@ -31,31 +31,20 @@ Prefer the lowest layer that proves the behavior. Add an E2E spec only for user-
 
 {{STACK:testing-setup}}
 
-## Scripts
-
-| Command | Runs |
-| --- | --- |
-| `{{CMD_DEV}}` | Development server |
-| `{{CMD_BUILD}}` | Production build |
-| `{{CMD_LINT}}` | Lint |
-| `{{CMD_TYPECHECK}}` | Type check |
-| `{{CMD_TEST}}` | Unit and component tests, single run |
-| `{{CMD_TEST_WATCH}}` | Unit tests in watch mode (TDD loop) |
-| `{{CMD_E2E}}` | Playwright end-to-end tests |
-
 ## Commands
 
-```bash
-{{CMD_TEST_FILE}}                      # one unit test file
-{{CMD_TEST_WATCH}}                     # TDD loop
-{{CMD_TYPECHECK}}
-{{CMD_LINT}}
+The exact commands are defined once, in the Toolchain section of `AGENTS.md`. This table says which one to use for each goal.
 
-{{CMD_E2E}} --list                     # discover specs, no server
-{{CMD_E2E}} {{E2E_DIR}}/<flow>.spec.ts # one spec
-{{CMD_E2E}} --grep "<title>"           # one test by title
-{{CMD_E2E}} --debug {{E2E_DIR}}/<flow>.spec.ts
-{{PM_EXEC}} playwright show-trace <test-results>/<run>/trace.zip
-```
+| Goal | Command |
+| --- | --- |
+| One unit test file | `test-file` |
+| TDD loop | `test-watch` |
+| All unit and component tests | `test` |
+| Type check and lint | `typecheck`, `lint` |
+| Discover E2E specs without starting the server | `e2e` with `--list` |
+| One E2E spec | `e2e` with `{{E2E_DIR}}/<flow>.spec.ts` |
+| One E2E test by title | `e2e` with `--grep "<title>"` |
+| Debug an E2E spec | `e2e` with `--debug {{E2E_DIR}}/<flow>.spec.ts` |
+| Open a failure trace | `e2e-trace` with `<test-results>/<run>/trace.zip` |
 
-Run the complete E2E suite (`{{CMD_E2E}}` with no filter) only when the user explicitly asks for it.
+Run the complete E2E suite (the `e2e` command with no filter) only when the user explicitly asks for it.

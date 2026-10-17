@@ -1,22 +1,21 @@
 # Stack: Angular CLI
 
-Snippets for `{{STACK:<name>}}` markers. Based on an Angular 20 CLI application (module-based, Angular Material and Bootstrap, Karma/Jasmine unit tests, Playwright under `e2e/`). Values marked "verify" differ between projects; confirm them in step 1 of `APPLY.md`.
+Snippets for `{{STACK:<name>}}` markers. Based on an Angular 20 CLI application (module-based, Angular Material and Bootstrap, Karma/Jasmine unit tests, Playwright under `e2e/`). Values marked "verify" differ between projects; confirm them in step 1 of `APPLY.md`. Commands use the `{{RUN:…}}`, `{{EXEC:…}}`, and `{{DLX:…}}` forms from step 3 of `APPLY.md` and never name a package manager; check each script name against `package.json`.
 
 ### profile-defaults
 
 | Variable | Typical value |
 | --- | --- |
-| `{{PM}}` / `{{PM_EXEC}}` | `npm` / `npx` |
 | `{{FRAMEWORK_DOCS}}` | `https://angular.dev` (match the installed major in `package.json`; APIs changed across versions) |
 | `{{SOURCE_DIR}}` | `` `src/app/` `` |
 | `{{STYLE_TOKENS_FILE}}` | `src/styles.scss` (verify; may be `src/assets/scss/` in template-based apps) |
 | `{{E2E_DIR}}` / `{{E2E_CONFIG}}` | `e2e/tests` / `e2e/playwright.config.ts` |
-| `{{CMD_DEV}}` / `{{CMD_BUILD}}` | `npm start` / `npm run build` |
-| `{{CMD_LINT}}` / `{{CMD_TYPECHECK}}` | `npm run lint` / `npx tsc --noEmit -p tsconfig.app.json` (verify the tsconfig name) |
-| `{{CMD_TEST}}` | `npm run test -- --watch=false --browsers=ChromeHeadless` |
-| `{{CMD_TEST_WATCH}}` | `npm run test` |
-| `{{CMD_TEST_FILE}}` | `npm run test -- --watch=false --browsers=ChromeHeadless --include=<file>` |
-| `{{CMD_E2E}}` | `npx playwright test --config=e2e/playwright.config.ts` |
+| `{{CMD_DEV}}` / `{{CMD_BUILD}}` | `{{RUN:start}}` / `{{RUN:build}}` |
+| `{{CMD_LINT}}` / `{{CMD_TYPECHECK}}` | `{{RUN:lint}}` / `{{EXEC:tsc --noEmit -p tsconfig.app.json}}` (verify the tsconfig name) |
+| `{{CMD_TEST}}` | `{{RUN:test --watch=false --browsers=ChromeHeadless}}` |
+| `{{CMD_TEST_WATCH}}` | `{{RUN:test}}` |
+| `{{CMD_TEST_FILE}}` | `{{RUN:test --watch=false --browsers=ChromeHeadless --include=<file>}}` |
+| `{{CMD_E2E}}` | `{{EXEC:playwright test --config=e2e/playwright.config.ts}}` |
 
 ### toolchain
 
@@ -83,13 +82,7 @@ flowchart LR
 
 Unit tests are configured by Angular CLI: `angular.json` target `test` (`karmaConfig`, `include: ["src/**/*.spec.ts"]`), `karma.conf.js`, `src/test.ts`, and `src/tsconfig.spec.json` with `"types": ["jasmine", "node"]`.
 
-Commands:
-
-```bash
-npm run test -- --watch=false --browsers=ChromeHeadless                       # full suite, headless
-npm run test -- --watch=false --browsers=ChromeHeadless --include=src/app/x.spec.ts
-npm run test                                                                  # watch mode
-```
+Run them with the `test` (full suite, headless), `test-file` (for example `src/app/x.spec.ts`), and `test-watch` commands from the Toolchain section of `AGENTS.md`.
 
 Common failures and fixes:
 
@@ -98,7 +91,7 @@ Common failures and fixes:
 - `Unexpected directive imported`: non-standalone components go in `declarations`, not `imports`.
 - `$(...).DataTable is not a function` or `Disconnected, because no message in 30000 ms`, usually with cascading `Error during cleanup of component`: jQuery plugin assets did not load in time in Karma. It is intermittent and not a failure of the code under test. Retry the suite; before accepting a red, confirm the failing file is among the modified ones (`git status --short -- <path>`).
 
-End-to-end tests (`@playwright/test`; `npx playwright install chromium` once per machine). `e2e/playwright.config.ts`:
+End-to-end tests (`@playwright/test`; run the `e2e-install` command once per machine). `e2e/playwright.config.ts`:
 
 ```ts
 import { defineConfig, devices } from '@playwright/test';
@@ -129,7 +122,7 @@ export default defineConfig({
   webServer: isRemote
     ? undefined
     : {
-        command: 'npx ng serve', // no -o: do not open a browser
+        command: '{{EXEC:ng serve}}', // no -o: do not open a browser
         port: 4200,
         reuseExistingServer: true, // ng serve's first compile is slow; see note below
         timeout: 120_000,

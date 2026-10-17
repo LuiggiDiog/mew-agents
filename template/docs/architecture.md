@@ -10,8 +10,7 @@ Describe what exists today in two or three sentences: entry points, feature modu
 
 | Concern | Choice |
 | --- | --- |
-| Runtime | Node.js {{NODE_VERSION}} |
-| Package manager | `{{PM}}` |
+| Runtime, package manager, commands | Toolchain section of `AGENTS.md` |
 | Framework | {{STACK}} (docs: {{FRAMEWORK_DOCS}}) |
 | Source | {{SOURCE_DIR}} |
 | Design tokens | `{{STYLE_TOKENS_FILE}}` (see `DESIGN.md`) |

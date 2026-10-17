@@ -11,6 +11,7 @@ The agent must read this whole file before touching the target project. It makes
 Read, without changing anything:
 
 - `package.json` (scripts, dependencies, `packageManager`, `engines`), the lockfile, `.nvmrc` or `.node-version`.
+- Package manager in use: the `packageManager` field first, then the lockfile (see the table in step 3; `.yarnrc.yml` marks Yarn Berry). Note conflicts: several lockfiles, or `packageManager` disagreeing with the lockfile. If neither exists, nothing is detected.
 - Framework and build config: `next.config.*`, `vite.config.*`, `angular.json`, `tsconfig*.json`.
 - Existing test config: `vitest.config.*`, `jest.config.*`, `karma.conf.js`, `playwright.config.ts` (root or under `e2e/`).
 - Existing `AGENTS.md`, `CLAUDE.md`, `DESIGN.md`, `README.md`, `docs/`, `.agents/`, `.claude/`, `.codex/`.
@@ -24,9 +25,10 @@ Pick the stack file from `stacks/` that matches: `nextjs`, `vite-react`, or `ang
 Ask these in one message, with the inferred defaults shown:
 
 1. Response language for the agent (default: Spanish).
-2. Tools in use: Claude Code, Codex, or both (default: both).
-3. Whether to install and configure the test tooling now (unit runner and Playwright) when the project lacks it, or only write the docs that describe the setup (default: write docs only; installation is a separate, explicitly requested step).
-4. Any project-specific rules to keep (domain terminology, safety invariants, environment URLs). Existing `AGENTS.md` content outside the template markers is kept automatically.
+2. Package manager for the project: npm, pnpm, Yarn, Bun, or another (default: the one detected in step 1; `pnpm` when nothing is detected). Mention any conflict found in step 1. If the choice differs from the detected one, the template is written for the choice and the migration is left as a follow-up (see step 4).
+3. Tools in use: Claude Code, Codex, or both (default: both).
+4. Whether to install and configure the test tooling now (unit runner and Playwright) when the project lacks it, or only write the docs that describe the setup (default: write docs only; installation is a separate, explicitly requested step).
+5. Any project-specific rules to keep (domain terminology, safety invariants, environment URLs). Existing `AGENTS.md` content outside the template markers is kept automatically.
 
 Do not ask about anything that step 1 already answered.
 
@@ -34,28 +36,56 @@ Do not ask about anything that step 1 already answered.
 
 Every template file uses `{{VARIABLE}}` placeholders. Replace all of them; a leftover `{{` is an error. The stack file's `### profile-defaults` section gives typical values.
 
-| Variable | Meaning | Example (Next.js + pnpm) |
+| Variable | Meaning | Example (Next.js, pnpm) |
 | --- | --- | --- |
 | `{{TEMPLATE_VERSION}}` | Version from `CHANGELOG.md` of this repo | `1.0.0` |
 | `{{PROJECT_NAME}}` | `name` from `package.json` or the folder name | `california-anime` |
 | `{{RESPONSE_LANGUAGE}}` | Language the agent answers in | `Spanish` |
 | `{{NODE_VERSION}}` | Runtime, as in `.nvmrc` plus the major | `` `lts/krypton` (Node 24 LTS) `` |
-| `{{PM}}` | Package manager name | `pnpm` |
-| `{{PM_EXEC}}` | Prefix to run a local binary | `pnpm exec` (`yarn`, `npx`) |
+| `{{PM}}`, `{{PM_LOCKFILE}}`, `{{PM_INSTALL}}`, `{{PM_ADD}}`, `{{PM_ADD_DEV}}` | Package manager chosen in step 2 and its commands (see "Package manager forms" below) | `pnpm`, `pnpm-lock.yaml`, `pnpm install`, `pnpm add`, `pnpm add -D` |
 | `{{STACK}}` | Stack file used | `nextjs` |
 | `{{FRAMEWORK_DOCS}}` | Where the framework docs for the installed version are | `` `node_modules/next/dist/docs/` `` |
 | `{{SOURCE_DIR}}` | Where application code lives | `` `app/` and `modules/` `` |
 | `{{STYLE_TOKENS_FILE}}` | Global stylesheet holding design tokens | `app/globals.css` |
 | `{{E2E_DIR}}` | Folder with Playwright specs | `tests/e2e` |
 | `{{E2E_CONFIG}}` | Playwright config path | `playwright.config.ts` |
-| `{{CMD_DEV}}` | Start the dev server | `pnpm dev` |
-| `{{CMD_BUILD}}` | Production build | `pnpm build` |
-| `{{CMD_LINT}}` | Lint | `pnpm lint` |
-| `{{CMD_TYPECHECK}}` | Type check (write `n/a` if the project has none) | `pnpm typecheck` |
-| `{{CMD_TEST}}` | Unit tests, single run | `pnpm test` |
-| `{{CMD_TEST_WATCH}}` | Unit tests in watch mode | `pnpm test:watch` |
-| `{{CMD_TEST_FILE}}` | Run one unit test file | `pnpm test <file>` |
+| `{{CMD_DEV}}` | Start the dev server | `pnpm run dev` |
+| `{{CMD_BUILD}}` | Production build | `pnpm run build` |
+| `{{CMD_LINT}}` | Lint | `pnpm run lint` |
+| `{{CMD_TYPECHECK}}` | Type check (write `n/a` if the project has none) | `pnpm run typecheck` |
+| `{{CMD_TEST}}` | Unit tests, single run | `pnpm run test` |
+| `{{CMD_TEST_WATCH}}` | Unit tests in watch mode | `pnpm run test:watch` |
+| `{{CMD_TEST_FILE}}` | Run one unit test file | `pnpm run test <file>` |
 | `{{CMD_E2E}}` | Playwright base command, including config if not at the root | `pnpm exec playwright test` |
+
+`{{CMD_*}}` values come from the stack file's `### profile-defaults`, written as package-manager forms; compose them with the chosen package manager and check each script name against `package.json`.
+
+### Package manager forms
+
+Template and stack files never name a package manager. Besides the `{{PM*}}` variables, they use three forms, which are resolved with the column of the package manager chosen in step 2:
+
+- `{{RUN:<script> [args]}}` runs a `package.json` script, with or without arguments.
+- `{{EXEC:<bin> [args]}}` runs a binary installed in the project.
+- `{{DLX:<package> [args]}}` runs a package without adding it to the project.
+
+| | npm | pnpm | Yarn Berry (2+) | Yarn Classic (1.x) | Bun |
+| --- | --- | --- | --- | --- | --- |
+| `{{PM}}` | `npm` | `pnpm` | `yarn` | `yarn` | `bun` |
+| `{{PM_LOCKFILE}}` | `package-lock.json` | `pnpm-lock.yaml` | `yarn.lock` | `yarn.lock` | `bun.lock` |
+| `{{PM_INSTALL}}` | `npm install` | `pnpm install` | `yarn install` | `yarn install` | `bun install` |
+| `{{PM_ADD}}` | `npm install` | `pnpm add` | `yarn add` | `yarn add` | `bun add` |
+| `{{PM_ADD_DEV}}` | `npm install -D` | `pnpm add -D` | `yarn add -D` | `yarn add -D` | `bun add --dev` |
+| `{{RUN:s}}` | `npm run s` | `pnpm run s` | `yarn run s` | `yarn run s` | `bun run s` |
+| `{{RUN:s args}}` | `npm run s -- args` | `pnpm run s args` | `yarn run s args` | `yarn run s args` | `bun run s args` |
+| `{{EXEC:bin args}}` | `npx bin args` | `pnpm exec bin args` | `yarn bin args` | `yarn bin args` | `bunx bin args` |
+| `{{DLX:pkg args}}` | `npx --yes pkg args` | `pnpm dlx pkg args` | `yarn dlx pkg args` | `npx --yes pkg args` | `bunx pkg args` |
+
+Notes:
+
+- npm is the only one that needs `--` before script arguments; without it npm consumes flags such as `--watch=false` itself.
+- Yarn Classic has no `dlx`; one-off packages run through `npx`, which never touches the project's dependencies or lockfile.
+- Bun before 1.2 writes `bun.lockb`; use whichever lockfile the project has.
+- For a package manager not in the table, add a column with its equivalents in this file and say so in the report.
 
 Stack snippets: every `{{STACK:<name>}}` marker is replaced by the body of the `### <name>` section of the chosen stack file (without the heading). Markers used: `toolchain`, `architecture`, `ui-rules`, `test-layers`, `testing-setup`, `testing-map`, `layout`, `e2e-gotchas`.
 
@@ -77,6 +107,8 @@ Copy from `template/` into the project root, after filling variables and snippet
 | `docs/context/` | Do not create | Keep |
 | `.nvmrc`, `package.json` `engines` | Add only if missing and the Node version is known | Keep |
 
+If the package manager chosen in step 2 differs from the detected one, write every file for the chosen one, but do not delete or create lockfiles, reinstall dependencies, or edit `packageManager`. Report the migration as a follow-up: remove the old lockfile, run `{{PM_INSTALL}}` with the chosen package manager, set `packageManager` in `package.json`, and update any CI or config that calls the old one.
+
 Other `.md` files at the project root (except `README.md`) are moved into `docs/` with a kebab-case name, and references to them updated, unless the user says otherwise.
 
 The Next.js `<!-- BEGIN:nextjs-agent-rules -->` block is generated by `next dev`; leave it wherever it is.
@@ -93,12 +125,13 @@ Run only what exists; do not install anything unless the user chose that in step
 
 - `grep -rn "{{" AGENTS.md DESIGN.md docs .agents .claude .codex` returns nothing.
 - `AGENTS.md` markers are balanced: every `BEGIN` has one `END` with the same id.
-- `npx @google/design.md lint DESIGN.md` reports no errors (the empty skeleton passes).
+- No package manager is named outside the Toolchain block of `AGENTS.md`: `grep -rnwE 'npm|npx|pnpm|yarn|bun|bunx' .agents .claude/agents .codex/agents DESIGN.md docs/agent-workflows.md docs/e2e-playbook.md docs/architecture.md` returns nothing. The only expected matches elsewhere are config code that runs a command, such as `webServer.command` in the setup section of `docs/testing.md`. A preserved `DESIGN.md` or `docs/architecture.md` from an older template version may still name one; report it instead of rewriting those files.
+- The `design-lint` command from the Toolchain block reports no errors (the empty skeleton passes).
 - Symlink: `ls -la .claude/skills` points to `../.agents/skills`.
 - Every `.codex/agents/*.toml` parses (balanced `"""`, quoted strings).
-- If Playwright is configured: `{{CMD_E2E}} --list` lists specs without starting the server.
-- If a unit runner is configured: run one existing test file with `{{CMD_TEST_FILE}}`.
-- If a type check exists: `{{CMD_TYPECHECK}}`.
+- If Playwright is configured: the `e2e` command with `--list` lists specs without starting the server.
+- If a unit runner is configured: run one existing test file with the `test-file` command.
+- If a type check exists: the `typecheck` command.
 
 Do not run the full E2E suite or a production build during the apply.
 
@@ -106,8 +139,8 @@ Do not run the full E2E suite or a production build during the apply.
 
 In the response language, state:
 
-- Template version applied and stack file used.
+- Template version applied, stack file used, and package manager chosen, noting whether it differs from the detected one.
 - Files written, replaced, merged, and left untouched, with the reason for each exception.
 - Paragraphs moved to the project-specific area or `docs/context/`, and anything dropped.
 - Checks run with their outcome, and checks skipped with the reason.
-- Follow-ups the user may want: install test tooling (see the stack file's `testing-setup`), fill `DESIGN.md`, fill `docs/architecture.md`, open a new agent session so the new skills and profiles load.
+- Follow-ups the user may want: migrate the package manager when the choice differs from the detected one (step 4), install test tooling (see the stack file's `testing-setup`), fill `DESIGN.md`, fill `docs/architecture.md`, open a new agent session so the new skills and profiles load.

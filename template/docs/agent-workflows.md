@@ -45,7 +45,7 @@ The stronger model goes to work with coupled correctness constraints (business l
 
 ## Context for every agent
 
-- `AGENTS.md`: binding rules (communication, toolchain, architecture, TDD, E2E, validation).
+- `AGENTS.md`: binding rules (communication, toolchain, architecture, TDD, E2E, validation). Its Toolchain section is the only source for the runtime, the package manager, and the exact commands that skills and profiles name.
 - `docs/architecture.md`: structure, layers, and boundaries.
 - `docs/testing.md`: TDD loop, test layers, setup, and commands.
 - `docs/e2e-playbook.md`: Playwright patterns, anti-flake rules, and failure signatures.
