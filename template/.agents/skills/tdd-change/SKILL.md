@@ -1,6 +1,6 @@
 ---
 name: tdd-change
-description: Use for any behavior change, bug fix, or new feature in services, components, routes, or API handlers. Drives the test-first loop. Skip for docs-only, formatting-only, or initial configuration work.
+description: Use for any behavior change, bug fix, or new feature in services, components, routes, or the API layer. Drives the test-first loop. Skip for docs-only, formatting-only, or initial configuration work.
 ---
 
 # Test-first change workflow

@@ -68,6 +68,8 @@ export class HomePage {
 | Is it a third-party provider outside the product?                | Keep the app flow real; fake only that boundary   | Standard flow    |
 | Could the mock break session or cache assumptions?               | Do not mock it                                    | Mock can work    |
 
+### Stack-specific gotchas
+
 {{STACK:e2e-gotchas}}
 
 ## 5. Spec design
