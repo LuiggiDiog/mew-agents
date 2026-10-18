@@ -1,0 +1,53 @@
+{
+  "run_id": "t1-typo__1.5.0__r2",
+  "version": "1.5.0",
+  "task": "t1-typo",
+  "size": "trivial",
+  "rep": 2,
+  "model": "sonnet",
+  "completed": true,
+  "question_rounds": 0,
+  "wall_s": 12.9,
+  "duration_s": 11.8,
+  "cost_usd": 0.0834,
+  "turns": 3,
+  "input_tokens": 110616,
+  "output_tokens": 523,
+  "errors": [],
+  "final_message": "Corregí el typo \"Add to crat\" → \"Add to cart\" en tres archivos:\n- `src/modules/catalog/components/ProductList.tsx`: el texto del botón.\n- `src/modules/catalog/components/ProductList.test.tsx`: el nombre que busca el test.\n- `e2e/tests/pages/shop.page.ts`: el locator del page object de E2E.\n\nEs un cambio de texto sin lógica nueva, así que no escribí un test rojo antes. Ejecuté `test-related` sobre `ProductList.tsx` y pasaron 3 tests de 3.\n\nNo ejecuté E2E, lint ni typecheck. El cambio del page object de E2E queda sin ejecutar. Si quieres comprobarlo, puedes correr `e2e --grep \"@catalog\"`.",
+  "tool_calls": 2,
+  "bash_commands": 2,
+  "edits": 3,
+  "subagents": 0,
+  "unit_focused": 1,
+  "unit_full": 0,
+  "e2e_focused": 0,
+  "e2e_full": 0,
+  "e2e_prod_runs": 0,
+  "builds": 0,
+  "typecheck": 0,
+  "lint": 0,
+  "unit_tests_executed": 3,
+  "e2e_tests_executed": 0,
+  "check_time_s": 4.8,
+  "test_first": false,
+  "red_seen": false,
+  "commands": [
+    "grep -rn \"crat\" --exclude-dir=node_modules --exclude-dir=.git . | head",
+    "sed -i '' 's/Add to crat/Add to cart/' e2e/tests/pages/shop.page.ts src/modules/catalog/components/ProductList.tsx src/modules/catalog/components/ProductList.test.tsx && pnpm exec vitest related --run src/modules/catalog/components/ProductList.tsx 2>&1 | tail -8"
+  ],
+  "changed_files": [
+    "e2e/tests/pages/shop.page.ts",
+    "src/modules/catalog/components/ProductList.test.tsx",
+    "src/modules/catalog/components/ProductList.tsx"
+  ],
+  "quality": {
+    "unit": true,
+    "typecheck": true,
+    "lint": true,
+    "e2e": true,
+    "hidden": true,
+    "no_wait_for_timeout": true,
+    "e2e_failed_files": []
+  }
+}

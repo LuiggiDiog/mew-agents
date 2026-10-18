@@ -43,7 +43,7 @@ python3 bench/run.py --rescore bench/results/<stamp>   # recompute metrics from 
 python3 bench/report.py                       # rebuild the latest REPORT.md
 ```
 
-Requirements: `claude` CLI logged in, pnpm, Node 24, and Playwright's Chromium installed. Runs execute with `--dangerously-skip-permissions` inside throwaway workspaces under the system temp directory (`--workdir` to change it). Each run also leaves a session in `~/.claude/projects/`.
+Requirements: `claude` CLI logged in, pnpm, Node 24 (the runner refuses to start on an older Node, because Vitest 5 then runs no tests and every unit result reads as failed), and Playwright's Chromium installed. Runs execute with `--dangerously-skip-permissions` inside throwaway workspaces under the system temp directory (`--workdir` to change it). Each run also leaves a session in `~/.claude/projects/`.
 
 To add a version, add it to `versions.json` with its git ref (or `WORKTREE`), its Playwright variant, and the variables it introduced.
 

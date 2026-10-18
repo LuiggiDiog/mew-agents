@@ -1,0 +1,53 @@
+{
+  "run_id": "t1-typo__1.5.0__r1",
+  "version": "1.5.0",
+  "task": "t1-typo",
+  "size": "trivial",
+  "rep": 1,
+  "model": "sonnet",
+  "completed": true,
+  "question_rounds": 0,
+  "wall_s": 11.3,
+  "duration_s": 10.2,
+  "cost_usd": 0.0782,
+  "turns": 3,
+  "input_tokens": 110689,
+  "output_tokens": 609,
+  "errors": [],
+  "final_message": "Corregí el typo \"Add to crat\" → \"Add to cart\" en tres archivos:\n\n- `src/modules/catalog/components/ProductList.tsx`: el texto del botón.\n- `src/modules/catalog/components/ProductList.test.tsx`: el locator del test.\n- `e2e/tests/pages/shop.page.ts`: el locator del page object, para que el E2E siga encontrando el botón.\n\nValidación: `test-related` sobre `ProductList.tsx` pasó (3 tests) y `lint-files` sobre los tres archivos no dio errores. No corrí E2E: solo cambia el texto del locator y el flujo no varió. Si quieres verificarlo, sería `e2e --grep \"@catalog\"`.\n\nMe salté TDD porque es un cambio de copy sin cambio de comportamiento.",
+  "tool_calls": 2,
+  "bash_commands": 2,
+  "edits": 3,
+  "subagents": 0,
+  "unit_focused": 1,
+  "unit_full": 0,
+  "e2e_focused": 0,
+  "e2e_full": 0,
+  "e2e_prod_runs": 0,
+  "builds": 0,
+  "typecheck": 0,
+  "lint": 1,
+  "unit_tests_executed": 3,
+  "e2e_tests_executed": 0,
+  "check_time_s": 3.0,
+  "test_first": false,
+  "red_seen": false,
+  "commands": [
+    "grep -rniF \"add to crat\" . --exclude-dir=node_modules --exclude-dir=.git",
+    "sed -i '' 's/Add to crat/Add to cart/' e2e/tests/pages/shop.page.ts src/modules/catalog/components/ProductList.tsx src/modules/catalog/components/ProductList.test.tsx && pnpm exec vitest related --run src/modules/catalog/components/ProductList.tsx 2>&1 | tail -8; pnpm exec eslint --cache src/modules/catalog/components/ProductList.tsx src/modules/catalog/components/ProductList.test.tsx e2e/tests/pages/shop.page.ts 2>&1 | tail -5"
+  ],
+  "changed_files": [
+    "e2e/tests/pages/shop.page.ts",
+    "src/modules/catalog/components/ProductList.test.tsx",
+    "src/modules/catalog/components/ProductList.tsx"
+  ],
+  "quality": {
+    "unit": true,
+    "typecheck": true,
+    "lint": true,
+    "e2e": true,
+    "hidden": true,
+    "no_wait_for_timeout": true,
+    "e2e_failed_files": []
+  }
+}

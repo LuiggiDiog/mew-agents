@@ -1,0 +1,53 @@
+{
+  "run_id": "t1-typo__1.5.0__r3",
+  "version": "1.5.0",
+  "task": "t1-typo",
+  "size": "trivial",
+  "rep": 3,
+  "model": "sonnet",
+  "completed": true,
+  "question_rounds": 0,
+  "wall_s": 10.5,
+  "duration_s": 9.3,
+  "cost_usd": 0.0834,
+  "turns": 3,
+  "input_tokens": 110692,
+  "output_tokens": 497,
+  "errors": [],
+  "final_message": "Corregí el typo \"Add to crat\" por \"Add to cart\" en tres archivos:\n- `src/modules/catalog/components/ProductList.tsx`: el texto del botón.\n- `src/modules/catalog/components/ProductList.test.tsx`: el locator del test.\n- `e2e/tests/pages/shop.page.ts`: el locator del page object de e2e, para que el spec no se rompa.\n\n**Validación:** corrí `ProductList.test.tsx` y pasaron los 3 tests. No corrí e2e, lint ni typecheck: el cambio es solo texto y en e2e solo cambió la cadena del locator. No hice commit.",
+  "tool_calls": 2,
+  "bash_commands": 2,
+  "edits": 3,
+  "subagents": 0,
+  "unit_focused": 1,
+  "unit_full": 0,
+  "e2e_focused": 0,
+  "e2e_full": 0,
+  "e2e_prod_runs": 0,
+  "builds": 0,
+  "typecheck": 0,
+  "lint": 0,
+  "unit_tests_executed": 3,
+  "e2e_tests_executed": 0,
+  "check_time_s": 2.1,
+  "test_first": false,
+  "red_seen": false,
+  "commands": [
+    "grep -rn \"crat\" --exclude-dir=node_modules --exclude-dir=.git . | head",
+    "sed -i '' 's/Add to crat/Add to cart/' e2e/tests/pages/shop.page.ts src/modules/catalog/components/ProductList.tsx src/modules/catalog/components/ProductList.test.tsx && pnpm run test src/modules/catalog/components/ProductList.test.tsx 2>&1 | tail -8"
+  ],
+  "changed_files": [
+    "e2e/tests/pages/shop.page.ts",
+    "src/modules/catalog/components/ProductList.test.tsx",
+    "src/modules/catalog/components/ProductList.tsx"
+  ],
+  "quality": {
+    "unit": true,
+    "typecheck": true,
+    "lint": true,
+    "e2e": true,
+    "hidden": true,
+    "no_wait_for_timeout": true,
+    "e2e_failed_files": []
+  }
+}

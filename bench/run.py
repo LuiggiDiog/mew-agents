@@ -45,6 +45,16 @@ def sh(cmd: str, cwd: Path, env: dict | None = None, timeout: int = 900) -> tupl
         return 124, f"timeout after {timeout}s: {error}"
 
 
+def check_node() -> None:
+    """The fixture's toolchain (Vitest 5) needs the Node major in fixture/.nvmrc; an older
+    Node makes every unit run fail silently and poisons the whole benchmark."""
+    wanted = (BENCH / "fixture" / ".nvmrc").read_text().strip()
+    code, version = sh("node -p process.versions.node", BENCH)
+    major = int(version.strip().split(".")[0]) if code == 0 and version.strip() else 0
+    if major < 22:
+        raise SystemExit(f"Node {version.strip() or 'missing'} found; the fixture needs {wanted} (Node 24). Run `nvm use 24` first.")
+
+
 def prepare_base(workdir: Path) -> Path:
     """Installed copy of the fixture. Only node_modules is cached; sources are synced every time."""
     base = workdir / "base"
@@ -231,7 +241,7 @@ def transcript_metrics(events: list[dict], variant: str) -> dict:
     }
 
 
-def quality(ws: Path, task: dict, port: int) -> dict:
+def quality(ws: Path, logs: Path, task: dict, port: int) -> dict:
     """Full suites plus hidden tests, in one pass per runner, with the runners in parallel."""
     agent_diff = sh("git diff HEAD", ws)[1] + "".join(
         (ws / f).read_text(errors="ignore") for f in changed_files(ws) if (ws / f).is_file()
@@ -246,8 +256,12 @@ def quality(ws: Path, task: dict, port: int) -> dict:
         "e2e": (f"{E2E} --reporter=json", {"E2E_PORT": str(port), "E2E_PROD": "1", "PLAYWRIGHT_JSON_OUTPUT_NAME": str(e2e_json)}),
     }
     with futures.ThreadPoolExecutor(len(commands)) as pool:
-        codes = {name: pool.submit(sh, cmd, ws, env) for name, (cmd, env) in commands.items()}
-        codes = {name: job.result()[0] for name, job in codes.items()}
+        jobs = {name: pool.submit(sh, cmd, ws, env) for name, (cmd, env) in commands.items()}
+        outputs = {name: job.result() for name, job in jobs.items()}
+        codes = {name: code for name, (code, _) in outputs.items()}
+    # Keep each check's output: a suite that is red after the agent needs a cause (agent or flake).
+    for name, (_, text) in outputs.items():
+        (logs / f"quality-{name}.log").write_text(text)
 
     def hidden_split(outcomes: list[tuple[str, bool]]) -> tuple[bool, bool | None]:
         visible = [ok for file, ok in outcomes if "zz-hidden" not in file]
@@ -309,7 +323,7 @@ def run_one(version: str, task: dict, rep: int, model: str, base: Path, workdir:
         **transcript_metrics([e for s in sessions for e in s["events"]], variant),
         "changed_files": changed_files(ws),
     }
-    record["quality"] = quality(ws, task, port + 1)
+    record["quality"] = quality(ws, logs, task, port + 1)
     (logs / "metrics.json").write_text(json.dumps(record, indent=2, ensure_ascii=False))
     shutil.rmtree(ws, ignore_errors=True)
     return record
@@ -352,6 +366,7 @@ def main() -> None:
     tasks = [json.loads((BENCH / "tasks" / t / "task.json").read_text()) for t in task_ids]
     workdir = Path(args.workdir)
     workdir.mkdir(parents=True, exist_ok=True)
+    check_node()
     out = Path(args.resume) if args.resume else BENCH / "results" / dt.datetime.now().strftime("%Y%m%d-%H%M")
     out.mkdir(parents=True, exist_ok=True)
     base = prepare_base(workdir)

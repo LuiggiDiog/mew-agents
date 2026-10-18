@@ -19,12 +19,55 @@
     "CMD_E2E": "pnpm exec playwright test --config=e2e/playwright.config.ts"
   },
   "versions": {
+    "1.0.0": {
+      "ref": "4b9ba37",
+      "playwright": "prod-always",
+      "vars": {
+        "PM_EXEC": "pnpm exec",
+        "CMD_TYPECHECK": "pnpm run typecheck"
+      }
+    },
     "1.2.0": {
       "ref": "52a4d34",
       "playwright": "prod-always",
       "vars": {
         "PM_EXEC": "pnpm exec",
         "CMD_TYPECHECK": "pnpm run typecheck"
+      }
+    },
+    "1.3.0": {
+      "ref": "dfab214",
+      "playwright": "prod-always",
+      "vars": {
+        "PM_LOCKFILE": "pnpm-lock.yaml",
+        "PM_INSTALL": "pnpm install",
+        "PM_ADD": "pnpm add",
+        "PM_ADD_DEV": "pnpm add -D",
+        "CMD_TYPECHECK": "pnpm run typecheck"
+      }
+    },
+    "1.4.0": {
+      "ref": "e3b9f39",
+      "playwright": "prod-always",
+      "vars": {
+        "PM_LOCKFILE": "pnpm-lock.yaml",
+        "PM_INSTALL": "pnpm install",
+        "PM_ADD": "pnpm add",
+        "PM_ADD_DEV": "pnpm add -D",
+        "CMD_TYPECHECK": "pnpm run typecheck"
+      }
+    },
+    "1.5.0": {
+      "ref": "94f1be0",
+      "playwright": "dev-prod",
+      "vars": {
+        "PM_LOCKFILE": "pnpm-lock.yaml",
+        "PM_INSTALL": "pnpm install",
+        "PM_ADD": "pnpm add",
+        "PM_ADD_DEV": "pnpm add -D",
+        "CMD_TYPECHECK": "pnpm exec tsc --noEmit --incremental",
+        "CMD_TEST_RELATED": "pnpm exec vitest related --run <files>",
+        "CMD_LINT_FILES": "pnpm exec eslint --cache <files>"
       }
     },
     "1.6.1": {
