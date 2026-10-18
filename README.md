@@ -11,7 +11,7 @@ template/                # files copied into a project, with {{VARIABLES}} and {
   AGENTS.md              # rules, split into BEGIN/END marked blocks
   CLAUDE.md              # @AGENTS.md
   DESIGN.md              # design standards skeleton (Google Labs DESIGN.md format)
-  lighthouserc.json      # Lighthouse CI: key routes and minimum scores
+  lighthouserc.json      # Lighthouse CI: key routes, minimum scores, metric budgets (median of 3 runs)
   .agents/skills/        # tdd-change, e2e-playwright, ui-accessibility, mobile-ux, web-performance, release-verification
   .claude/agents/        # Claude Code profiles (.md); .claude/skills -> ../.agents/skills
   .claude/settings.json  # Claude Code settings: no AI attribution in commits or PRs

@@ -119,7 +119,7 @@ No barrel files by default: one `index.ts` at a module boundary only when it cle
 <!-- BEGIN:agent-rules:performance -->
 ## Performance and Lighthouse
 
-Every key route in `lighthouserc.json` meets these Lighthouse scores on the default mobile profile: Performance, Best Practices, and SEO 90; Accessibility 95. Never lower a threshold, remove a route, or disable an audit to make a run pass.
+Every key route in `lighthouserc.json` meets, on the median of 3 runs with the default mobile profile, these Lighthouse scores: Performance, Best Practices, and SEO 90; Accessibility 95; and these budgets: LCP 2.5 s, CLS 0.1, TBT 200 ms (the lab proxy for INP). Never lower a threshold or budget, remove a route, or disable an audit to make a run pass.
 
 - The LCP element loads first (never lazy-loaded, explicit dimensions, modern format at the rendered size); each route ships only the JavaScript it needs, and every new client dependency is justified by its size; space is reserved for late content so CLS stays under 0.1.
 - Every page has a unique `<title>`, a meta description, `lang` on `<html>`, a viewport meta tag, crawlable `<a href>` links, and `alt` on images; the site serves a valid `robots.txt`; no console errors or insecure resources.

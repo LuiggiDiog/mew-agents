@@ -106,7 +106,7 @@ Copy from `template/` into the project root, after filling variables and snippet
 | `.claude/settings.json` | Write it (turns off commit and PR attribution) | Keep every existing key; set only `attribution` to the template's value and say so |
 | `.codex/config.toml` | Write it | Keep the existing one |
 | `docs/testing.md`, `docs/e2e-playbook.md`, `docs/agent-workflows.md` | Write them | Replace, after moving any project-specific content into `docs/context/` or the preserved area and saying so |
-| `lighthouserc.json` | Write it, with the key routes (1–5 public, representative URLs inferred from the router; ask only if none is obvious) | Keep; report thresholds lower than the template's |
+| `lighthouserc.json` | Write it, with the key routes (1–5 public, representative URLs inferred from the router; ask only if none is obvious) | Keep; report thresholds or budgets lower than the template's, and a missing `aggregationMethod: median` |
 | `@lhci/cli` dev dependency (the `lighthouse` command) | Add it with `{{PM_ADD_DEV}} @lhci/cli` only when the user chose to install tooling in step 2; otherwise list it as a follow-up | Keep |
 | `.gitignore` | Add `.lighthouseci/` if missing | Same |
 | `docs/architecture.md` | Write the skeleton | **Never overwrite.** Keep as is |
