@@ -163,7 +163,7 @@ Setup and configuration are in `docs/testing.md`; the step-by-step loop is the `
 
 These rules are binding; patterns, examples, and diagnosis are in `docs/e2e-playbook.md`.
 
-- E2E runs only against local or test environments (local, dev, staging), never against production. Playwright owns the app server (`webServer` in `{{E2E_CONFIG}}`, dedicated port, `reuseExistingServer: false`): the dev server by default, a local production build through `e2e-build` only when production can differ (see Validation) and in CI. Test-only environment values and fake providers, never real secrets.
+- E2E runs only against local or test environments (local, dev, staging), never against production; a hook blocks a base URL whose host does not look like one. Playwright owns the app server (`webServer` in `{{E2E_CONFIG}}`, dedicated port, `reuseExistingServer: false`): the dev server by default, a local production build through `e2e-build` only when production can differ (see Validation) and in CI. Test-only environment values and fake providers, never real secrets.
 - Test user-visible behavior with isolated tests; `test.describe.serial` only for true journeys. Locators by role and accessible name first, test ids before CSS, none matching several elements. Deterministic waits only, never `waitForTimeout`; assert the exact destination URL and readiness before acting.
 - Real app behavior first: mock only external, non-deterministic boundaries, for a concrete reason, and reach error states through the real path. Unique test data generated at runtime; retries only for known recoverable conflicts, 3–5 attempts.
 - Every spec is tagged with the module it covers (`{ tag: '@<module>' }`, the feature folder name). Page objects (one per page, with `assertLoaded()`) live in `{{E2E_DIR}}/pages/`, shared helpers in `{{E2E_DIR}}/helpers/`; a changed flow updates its spec, page objects, helpers, and flow docs in the same change.
@@ -180,7 +180,7 @@ Validate every change with the smallest scope that proves it. Climb one level on
 | 1. Focused | While iterating on a task | `test-file` with the test being written | `e2e` with the spec, `--grep "<title>"`, and `-x` |
 | 2. Related | Once the tasks are green, before reporting | `test-related` with the touched source files | `e2e` once, with the specs `affected` lists; `e2e-build` instead only when production can differ |
 | 3. Failed | After fixing failures found at level 2 | the failing test files | the command that failed, with `--last-failed` |
-| 4. Full | Only on explicit request; for unit tests also when test config, dependencies, or a module imported almost everywhere changed | `test` | the complete `e2e`, only on explicit request |
+| 4. Full | Only on explicit request; for unit tests also when test config, dependencies, or a module imported almost everywhere changed. Prefix the command with `FULL_SUITE=1`: a hook blocks full runs without it | `test` | the complete `e2e`, only on explicit request |
 
 - Level 2 E2E runs against the dev server. Use `e2e-build` for that single run only when the change can behave differently in a production build: routes or lazy chunks, build or bundler configuration, dependencies, assets, environment variables, or server rendering. Text, style, component, and service changes stay on the dev server, so a build is paid at most once per task and only when it proves something.
 - Level 2 starts with `affected` (with the base branch once the work is committed): it lists the unit tests the runner relates to the change, the specs Playwright relates to it, the specs tagged with each touched module, and the commands to run. Run those commands as printed, in one call per runner.
@@ -194,7 +194,7 @@ Validate every change with the smallest scope that proves it. Climb one level on
 <!-- BEGIN:agent-rules:orchestration -->
 ## Agent orchestration
 
-Profiles and skills are described in `docs/agent-workflows.md`. Skills live in `.agents/skills/` (shared with Claude Code through the `.claude/skills` symlink); profiles live in `.claude/agents/` and `.codex/agents/` and must stay in sync.
+Profiles and skills are described in `docs/agent-workflows.md`. Skills live in `.agents/skills/` (shared with Claude Code through the `.claude/skills` symlink); profiles live in `.claude/agents/` and `.codex/agents/` and must stay in sync. `.agents/hooks/guard.mjs` is the shell-command guard both tools run before each command (full suites and E2E environments); it enforces rules, it does not replace them.
 
 The primary thread owns the full request, the constraints in this file, integration, validation, and the final report, and works alone by default. Extra agents exist only to finish sooner: spending more tokens is acceptable when it shortens the time to a validated result, never otherwise. Delegate only when all three hold:
 

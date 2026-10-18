@@ -11,3 +11,14 @@ enabled = true
 max_concurrent_threads_per_session = 3
 default_subagent_model = "gpt-6-luna"
 default_subagent_reasoning_effort = "medium"
+
+# PreToolUse guard shared with Claude Code (see .agents/hooks/guard.mjs). Codex asks to trust
+# project hooks once (`/hooks`); the guard denies with exit code 2 and the reason on stderr.
+[[hooks.PreToolUse]]
+matcher = "^Bash$"
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'node "$(git rev-parse --show-toplevel)/.agents/hooks/guard.mjs"'
+timeout = 10
+statusMessage = "Checking the command against the test and environment guards"

@@ -13,8 +13,9 @@ The primary thread (the session you talk to) is the **orchestrator**. It owns th
 | Shared scripts  | `.agents/scripts/`                  | `.agents/scripts/`              |
 | Agent profiles  | `.claude/agents/*.md`               | `.codex/agents/*.toml`          |
 | Session config  | `.claude/settings.json`             | `.codex/config.toml`            |
+| Command guard   | `hooks` in `.claude/settings.json`  | `[[hooks.PreToolUse]]` in `.codex/config.toml` |
 
-`.claude/skills` is a symlink to `.agents/skills`, so each skill is written once. Agent profiles exist in both formats with the same instructions; when you change one, change its counterpart in the same commit.
+`.claude/skills` is a symlink to `.agents/skills`, so each skill is written once. Both hook entries run the same `.agents/hooks/guard.mjs` before every shell command: it denies (exit code 2, reason on stderr) a full unit or E2E suite not prefixed with `FULL_SUITE=1`, and an E2E base URL whose host is not local, dev, staging, test, QA, preview, or sandbox. Claude Code runs project hooks once the folder is trusted (and always in `-p` sessions); Codex asks to trust them once with `/hooks`. Agent profiles exist in both formats with the same instructions; when you change one, change its counterpart in the same commit.
 
 ## Agent profiles
 

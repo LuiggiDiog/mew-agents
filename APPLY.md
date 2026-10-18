@@ -103,10 +103,11 @@ Copy from `template/` into the project root, after filling variables and snippet
 | `DESIGN.md` | Write the skeleton | **Never overwrite.** Keep as is |
 | `.agents/skills/*/` | Write all six, with their `scripts/` | Replace a skill with the same name; keep other skills |
 | `.agents/scripts/affected-tests.mjs` | Write it (the `affected` command) | Replace |
+| `.agents/hooks/guard.mjs` | Write it (the command guard both tools run) | Replace; if the project added hosts to `TEST_HOSTS`, keep them and say so |
 | `.claude/skills` | Symlink to `../.agents/skills` | Keep; if `.claude/skills` is a real folder, move its skills to `.agents/skills/` and ask before replacing it with the symlink |
 | `.claude/agents/*.md`, `.codex/agents/*.toml` | Write all five in each format the user uses | Replace profiles with the same name; keep others |
-| `.claude/settings.json` | Write it (turns off commit and PR attribution) | Keep every existing key; set only `attribution` to the template's value and say so |
-| `.codex/config.toml` | Write it | Keep the existing one |
+| `.claude/settings.json` | Write it (attribution off, and the `PreToolUse` guard hook) | Keep every existing key; set `attribution` to the template's value and add the template's `PreToolUse` entry to `hooks` (keep other hooks), and say so |
+| `.codex/config.toml` | Write it | Keep the existing one and append the template's `[[hooks.PreToolUse]]` tables if it has none for `guard.mjs` |
 | `docs/testing.md`, `docs/e2e-playbook.md`, `docs/agent-workflows.md` | Write them | Replace, after moving any project-specific content into `docs/context/` or the preserved area and saying so |
 | `lighthouserc.json` | Write it, with the key routes (1–5 public, representative URLs inferred from the router; ask only if none is obvious) | Keep; report thresholds or budgets lower than the template's, and a missing `aggregationMethod: median` |
 | `@lhci/cli` dev dependency (the `lighthouse` command) | Add it with `{{PM_ADD_DEV}} @lhci/cli` only when the user chose to install tooling in step 2; otherwise list it as a follow-up | Keep |
@@ -140,6 +141,7 @@ Run only what exists; do not install anything unless the user chose that in step
 - If Playwright is configured: the `e2e` command with `--list` lists specs without starting the server. Report specs without a module tag (`@<module>`) as a follow-up; do not tag them during the apply.
 - If a unit runner is configured: run one existing test file with the `test-file` command.
 - If Playwright or a unit runner is configured: the `affected` command runs from the project root and prints its sections (with no changes, every section is empty and no command is proposed).
+- The guard denies a full suite: `echo '{"tool_input":{"command":"npm test"}}' | node .agents/hooks/guard.mjs` exits with code 2 and prints the reason. Tell the user that Claude Code runs the hook once the folder is trusted and in every `-p` session, and that Codex asks to trust it once with `/hooks`.
 - If a type check exists: the `typecheck` command.
 - Optional, Claude Code 2.1.283 or later: `/doctor prompt-audit` reports contradictions and stale rules across `AGENTS.md`, rules, skills, and profiles. Report what it finds; do not edit template blocks to resolve it.
 

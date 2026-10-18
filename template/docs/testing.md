@@ -44,4 +44,4 @@ The exact commands are defined once, in the Toolchain section of `AGENTS.md`. Th
 | Debug an E2E spec | `e2e` with `--debug {{E2E_DIR}}/<flow>.spec.ts` |
 | Open a failure trace | `e2e-trace` with `<test-results>/<run>/trace.zip` |
 
-Run the complete E2E suite (the `e2e` command with no filter) only when the user explicitly asks for it. E2E runs only against local or test environments (local, dev, staging), never against production.
+Run the complete E2E suite (the `e2e` command with no filter) only when the user explicitly asks for it, with `FULL_SUITE=1` in front of the command: the guard in `.agents/hooks/guard.mjs` blocks full unit or E2E runs without it, and E2E against a host that is not a test environment. E2E runs only against local or test environments (local, dev, staging), never against production.

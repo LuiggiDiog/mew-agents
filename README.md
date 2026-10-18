@@ -14,8 +14,9 @@ template/                # files copied into a project, with {{VARIABLES}} and {
   lighthouserc.json      # Lighthouse CI: key routes, minimum scores, metric budgets (median of 3 runs)
   .agents/skills/        # tdd-change, e2e-playwright, ui-accessibility, mobile-ux, web-performance, release-verification
   .agents/scripts/       # affected-tests.mjs: the `affected` command (tests and specs that cover the touched files)
+  .agents/hooks/         # guard.mjs: PreToolUse guard for both tools (no full suites without FULL_SUITE=1, no E2E outside test environments)
   .claude/agents/        # Claude Code profiles (.md); .claude/skills -> ../.agents/skills
-  .claude/settings.json  # Claude Code settings: no AI attribution in commits or PRs
+  .claude/settings.json  # Claude Code settings: no AI attribution in commits or PRs, guard hook
   .codex/agents/         # Codex profiles (.toml) + .codex/config.toml
   docs/                  # testing, e2e-playbook, agent-workflows, architecture skeleton
 bench/                   # behavioral benchmark: same tasks per template version (see bench/README.md)
