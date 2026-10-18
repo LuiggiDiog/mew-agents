@@ -1,0 +1,353 @@
+
+
+
+
+Running 19 tests using 7 workers
+
+[1/19] [chromium] › e2e/tests/cart-empty.spec.ts:18:5 › empty cart › leaves the empty state after adding Cake @cart
+[2/19] [chromium] › e2e/tests/cart-empty.spec.ts:5:3 › empty cart › starts empty @cart
+[3/19] [chromium] › e2e/tests/cart-empty.spec.ts:11:3 › empty cart › hides the total while empty @cart
+[4/19] [chromium] › e2e/tests/cart.spec.ts:12:5 › cart › adds Coffee and shows the total @cart
+[5/19] [chromium] › e2e/tests/cart-empty.spec.ts:18:5 › empty cart › leaves the empty state after adding Tea @cart
+[6/19] [chromium] › e2e/tests/cart.spec.ts:12:5 › cart › adds Tea and shows the total @cart
+[7/19] [chromium] › e2e/tests/cart-empty.spec.ts:18:5 › empty cart › leaves the empty state after adding Coffee @cart
+[8/19] [chromium] › e2e/tests/cart.spec.ts:12:5 › cart › adds Cake and shows the total @cart
+[9/19] [chromium] › e2e/tests/cart.spec.ts:21:3 › cart › groups repeated products in one row @cart
+[10/19] [chromium] › e2e/tests/cart.spec.ts:29:3 › cart › sums different products @cart
+[11/19] [chromium] › e2e/tests/catalog-accessibility.spec.ts:5:3 › catalog accessibility › has a page heading and a products heading @catalog
+[12/19] [chromium] › e2e/tests/catalog-accessibility.spec.ts:12:5 › catalog accessibility › Coffee has a reachable add button @catalog
+[13/19] [chromium] › e2e/tests/catalog-accessibility.spec.ts:12:5 › catalog accessibility › Tea has a reachable add button @catalog
+[14/19] [chromium] › e2e/tests/catalog-accessibility.spec.ts:12:5 › catalog accessibility › Cake has a reachable add button @catalog
+[15/19] [chromium] › e2e/tests/catalog.spec.ts:11:3 › catalog › lists every product @catalog
+[16/19] [chromium] › e2e/tests/catalog.spec.ts:17:5 › catalog › shows the price of Coffee @catalog
+[17/19] [chromium] › e2e/tests/catalog.spec.ts:17:5 › catalog › shows the price of Tea @catalog
+  1) [chromium] › e2e/tests/cart.spec.ts:12:5 › cart › adds Tea and shows the total @cart ──────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('region', { name: 'Cart' }).getByText('Tea × 1 — $2.50')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('region', { name: 'Cart' }).getByText('Tea × 1 — $2.50') with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Cart' }).getByText('Tea × 1 — $2.50')
+
+
+      14 |       await shop.goto();
+      15 |       await shop.addToCart(name);
+    > 16 |       await expect(shop.cart().getByText(`${name} × 1 — ${price}`)).toBeVisible();
+         |                                                                     ^
+      17 |       await expect(shop.cart().getByText(`Total: ${price}`)).toBeVisible();
+      18 |     });
+      19 |   }
+        at /private/var/folders/6g/l30_y37d7y564brvzmsg32h80000gn/T/agent-rules-bench/runs/t4-currency__1.7.0__r1/e2e/tests/cart.spec.ts:16:69
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/cart-cart-adds-Tea-and-shows-the-total-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: e2e/test-results/cart-cart-adds-Tea-and-shows-the-total-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    e2e/test-results/cart-cart-adds-Tea-and-shows-the-total-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace e2e/test-results/cart-cart-adds-Tea-and-shows-the-total-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  2) [chromium] › e2e/tests/cart.spec.ts:12:5 › cart › adds Coffee and shows the total @cart ───────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('region', { name: 'Cart' }).getByText('Coffee × 1 — $3.00')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('region', { name: 'Cart' }).getByText('Coffee × 1 — $3.00') with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Cart' }).getByText('Coffee × 1 — $3.00')
+
+
+      14 |       await shop.goto();
+      15 |       await shop.addToCart(name);
+    > 16 |       await expect(shop.cart().getByText(`${name} × 1 — ${price}`)).toBeVisible();
+         |                                                                     ^
+      17 |       await expect(shop.cart().getByText(`Total: ${price}`)).toBeVisible();
+      18 |     });
+      19 |   }
+        at /private/var/folders/6g/l30_y37d7y564brvzmsg32h80000gn/T/agent-rules-bench/runs/t4-currency__1.7.0__r1/e2e/tests/cart.spec.ts:16:69
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/cart-cart-adds-Coffee-and-shows-the-total-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: e2e/test-results/cart-cart-adds-Coffee-and-shows-the-total-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    e2e/test-results/cart-cart-adds-Coffee-and-shows-the-total-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace e2e/test-results/cart-cart-adds-Coffee-and-shows-the-total-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  3) [chromium] › e2e/tests/cart.spec.ts:12:5 › cart › adds Cake and shows the total @cart ─────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('region', { name: 'Cart' }).getByText('Cake × 1 — $4.25')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('region', { name: 'Cart' }).getByText('Cake × 1 — $4.25') with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Cart' }).getByText('Cake × 1 — $4.25')
+
+
+      14 |       await shop.goto();
+      15 |       await shop.addToCart(name);
+    > 16 |       await expect(shop.cart().getByText(`${name} × 1 — ${price}`)).toBeVisible();
+         |                                                                     ^
+      17 |       await expect(shop.cart().getByText(`Total: ${price}`)).toBeVisible();
+      18 |     });
+      19 |   }
+        at /private/var/folders/6g/l30_y37d7y564brvzmsg32h80000gn/T/agent-rules-bench/runs/t4-currency__1.7.0__r1/e2e/tests/cart.spec.ts:16:69
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/cart-cart-adds-Cake-and-shows-the-total-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: e2e/test-results/cart-cart-adds-Cake-and-shows-the-total-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    e2e/test-results/cart-cart-adds-Cake-and-shows-the-total-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace e2e/test-results/cart-cart-adds-Cake-and-shows-the-total-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  4) [chromium] › e2e/tests/cart.spec.ts:21:3 › cart › groups repeated products in one row @cart ───
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('region', { name: 'Cart' }).getByText('Coffee × 2 — $6.00')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('region', { name: 'Cart' }).getByText('Coffee × 2 — $6.00') with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Cart' }).getByText('Coffee × 2 — $6.00')
+
+
+      24 |     await shop.addToCart('Coffee');
+      25 |     await shop.addToCart('Coffee');
+    > 26 |     await expect(shop.cart().getByText('Coffee × 2 — $6.00')).toBeVisible();
+         |                                                               ^
+      27 |   });
+      28 |
+      29 |   test('sums different products', async ({ page }) => {
+        at /private/var/folders/6g/l30_y37d7y564brvzmsg32h80000gn/T/agent-rules-bench/runs/t4-currency__1.7.0__r1/e2e/tests/cart.spec.ts:26:63
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/cart-cart-groups-repeated-products-in-one-row-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: e2e/test-results/cart-cart-groups-repeated-products-in-one-row-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    e2e/test-results/cart-cart-groups-repeated-products-in-one-row-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace e2e/test-results/cart-cart-groups-repeated-products-in-one-row-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[18/19] [chromium] › e2e/tests/catalog.spec.ts:17:5 › catalog › shows the price of Cake @catalog
+  5) [chromium] › e2e/tests/cart.spec.ts:29:3 › cart › sums different products @cart ───────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('region', { name: 'Cart' }).getByText('Total: $5.50')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('region', { name: 'Cart' }).getByText('Total: $5.50') with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Cart' }).getByText('Total: $5.50')
+
+
+      32 |     await shop.addToCart('Coffee');
+      33 |     await shop.addToCart('Tea');
+    > 34 |     await expect(shop.cart().getByText('Total: $5.50')).toBeVisible();
+         |                                                         ^
+      35 |   });
+      36 | });
+      37 |
+        at /private/var/folders/6g/l30_y37d7y564brvzmsg32h80000gn/T/agent-rules-bench/runs/t4-currency__1.7.0__r1/e2e/tests/cart.spec.ts:34:57
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/cart-cart-sums-different-products-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: e2e/test-results/cart-cart-sums-different-products-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    e2e/test-results/cart-cart-sums-different-products-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace e2e/test-results/cart-cart-sums-different-products-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[19/19] [chromium] › e2e/tests/zz-hidden.spec.ts:3:1 › hidden: catalog and cart show soles
+  6) [chromium] › e2e/tests/catalog.spec.ts:17:5 › catalog › shows the price of Coffee @catalog ────
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('region', { name: 'Products' }).getByRole('listitem').filter({ hasText: 'Coffee' })
+    Expected substring: "$3.00"
+    Received string:    "Coffee S/ 3.00 Add to crat"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" getByRole('region', { name: 'Products' }).getByRole('listitem').filter({ hasText: 'Coffee' }) with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Products' }).getByRole('listitem').filter({ hasText: 'Coffee' })
+        14 × locator resolved to <li>…</li>
+           - unexpected value "Coffee S/ 3.00 Add to crat"
+
+
+      18 |       const shop = new ShopPage(page);
+      19 |       await shop.goto();
+    > 20 |       await expect(shop.product(name)).toContainText(price);
+         |                                        ^
+      21 |     });
+      22 |   }
+      23 | });
+        at /private/var/folders/6g/l30_y37d7y564brvzmsg32h80000gn/T/agent-rules-bench/runs/t4-currency__1.7.0__r1/e2e/tests/catalog.spec.ts:20:40
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/catalog-catalog-shows-the-price-of-Coffee-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: e2e/test-results/catalog-catalog-shows-the-price-of-Coffee-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    e2e/test-results/catalog-catalog-shows-the-price-of-Coffee-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace e2e/test-results/catalog-catalog-shows-the-price-of-Coffee-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  7) [chromium] › e2e/tests/catalog.spec.ts:17:5 › catalog › shows the price of Tea @catalog ───────
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('region', { name: 'Products' }).getByRole('listitem').filter({ hasText: 'Tea' })
+    Expected substring: "$2.50"
+    Received string:    "Tea S/ 2.50 Add to crat"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" getByRole('region', { name: 'Products' }).getByRole('listitem').filter({ hasText: 'Tea' }) with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Products' }).getByRole('listitem').filter({ hasText: 'Tea' })
+        14 × locator resolved to <li>…</li>
+           - unexpected value "Tea S/ 2.50 Add to crat"
+
+
+      18 |       const shop = new ShopPage(page);
+      19 |       await shop.goto();
+    > 20 |       await expect(shop.product(name)).toContainText(price);
+         |                                        ^
+      21 |     });
+      22 |   }
+      23 | });
+        at /private/var/folders/6g/l30_y37d7y564brvzmsg32h80000gn/T/agent-rules-bench/runs/t4-currency__1.7.0__r1/e2e/tests/catalog.spec.ts:20:40
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/catalog-catalog-shows-the-price-of-Tea-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: e2e/test-results/catalog-catalog-shows-the-price-of-Tea-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    e2e/test-results/catalog-catalog-shows-the-price-of-Tea-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace e2e/test-results/catalog-catalog-shows-the-price-of-Tea-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  8) [chromium] › e2e/tests/catalog.spec.ts:17:5 › catalog › shows the price of Cake @catalog ──────
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('region', { name: 'Products' }).getByRole('listitem').filter({ hasText: 'Cake' })
+    Expected substring: "$4.25"
+    Received string:    "Cake S/ 4.25 Add to crat"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" getByRole('region', { name: 'Products' }).getByRole('listitem').filter({ hasText: 'Cake' }) with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Products' }).getByRole('listitem').filter({ hasText: 'Cake' })
+        14 × locator resolved to <li>…</li>
+           - unexpected value "Cake S/ 4.25 Add to crat"
+
+
+      18 |       const shop = new ShopPage(page);
+      19 |       await shop.goto();
+    > 20 |       await expect(shop.product(name)).toContainText(price);
+         |                                        ^
+      21 |     });
+      22 |   }
+      23 | });
+        at /private/var/folders/6g/l30_y37d7y564brvzmsg32h80000gn/T/agent-rules-bench/runs/t4-currency__1.7.0__r1/e2e/tests/catalog.spec.ts:20:40
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/catalog-catalog-shows-the-price-of-Cake-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: e2e/test-results/catalog-catalog-shows-the-price-of-Cake-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    e2e/test-results/catalog-catalog-shows-the-price-of-Cake-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace e2e/test-results/catalog-catalog-shows-the-price-of-Cake-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  8 failed
+    [chromium] › e2e/tests/cart.spec.ts:12:5 › cart › adds Coffee and shows the total @cart ────────
+    [chromium] › e2e/tests/cart.spec.ts:12:5 › cart › adds Tea and shows the total @cart ───────────
+    [chromium] › e2e/tests/cart.spec.ts:12:5 › cart › adds Cake and shows the total @cart ──────────
+    [chromium] › e2e/tests/cart.spec.ts:21:3 › cart › groups repeated products in one row @cart ────
+    [chromium] › e2e/tests/cart.spec.ts:29:3 › cart › sums different products @cart ────────────────
+    [chromium] › e2e/tests/catalog.spec.ts:17:5 › catalog › shows the price of Coffee @catalog ─────
+    [chromium] › e2e/tests/catalog.spec.ts:17:5 › catalog › shows the price of Tea @catalog ────────
+    [chromium] › e2e/tests/catalog.spec.ts:17:5 › catalog › shows the price of Cake @catalog ───────
+  11 passed (21.4s)
+[WebServer] $ vite build
+[WebServer] [PLUGIN_TIMINGS] JavaScript callbacks ran for 8.3s of this 8.4s build (99%).
+[WebServer] The slowest callbacks, timed inside each callback (the wait before a callback starts is excluded, the time it awaits is included):
+[WebServer]   - plugin production-build-cost buildStart (95%, 8.0s, 1 call)
+[WebServer] Additional callback time came from callbacks under 1s.
+[WebServer] See https://rolldown.rs/reference/InputOptions.checks#bundlertimings for more details.
+[WebServer] 
+[WebServer] $ vite preview --port 4571 --strictPort

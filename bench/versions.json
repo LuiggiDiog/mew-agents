@@ -83,7 +83,7 @@
         "CMD_LINT_FILES": "pnpm exec eslint --cache <files>"
       }
     },
-    "1.7.0": {
+    "2.0.0": {
       "ref": "WORKTREE",
       "playwright": "dev-build",
       "vars": {

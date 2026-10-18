@@ -15,7 +15,7 @@ Snippets for `{{STACK:<name>}}` markers. Based on an Angular 20 CLI application 
 | `{{CMD_DEV}}` / `{{CMD_BUILD}}` | `{{RUN:start}}` / `{{RUN:build}}` |
 | `{{CMD_LINT}}` / `{{CMD_TYPECHECK}}` | `{{RUN:lint}}` / `{{EXEC:tsc --noEmit --incremental -p tsconfig.app.json}}` (verify the tsconfig name) |
 | `{{CMD_TEST}}` | `{{RUN:test --watch=false --browsers=ChromeHeadless}}` |
-| `{{CMD_TEST_WATCH}}` | `{{RUN:test}}` |
+| `{{CMD_TEST_WATCH}}` | `{{RUN:test --include=<file>}}` |
 | `{{CMD_TEST_FILE}}` | `{{RUN:test --watch=false --browsers=ChromeHeadless --include=<file>}}` |
 | `{{CMD_TEST_RELATED}}` | `{{RUN:test --watch=false --browsers=ChromeHeadless --include=<spec> --include=<spec>}}` with the specs of the touched files and of the files that import them (Karma has no import-graph mode) |
 | `{{CMD_LINT_FILES}}` | `{{EXEC:eslint --cache <files>}}` (verify the project uses `angular-eslint` with an ESLint config) |
@@ -70,7 +70,8 @@ src/
 e2e/
   playwright.config.ts
   tsconfig.json
-  fixtures/  helpers/  pages/  tests/
+  tests/
+    fixtures/  helpers/  pages/   # page objects and helpers live with the specs ({{E2E_DIR}})
 docs/
 ```
 
@@ -137,7 +138,7 @@ export default defineConfig({
 });
 ```
 
-Note on `reuseExistingServer`: the template rule prefers `false` so a stale server is never tested. The first `ng serve` compile is slow, so Angular projects usually reuse a running dev server while iterating; `ng serve` rebuilds on change, but restart it after config or dependency changes before trusting a green run. `e2e-build` and CI never reuse a server. `E2E_BASE_URL` points the same specs at a deployed test environment (dev or staging), never at production.
+Note on `reuseExistingServer`: the template rule prefers `false` so a stale server is never tested. The first `ng serve` compile is slow, so Angular projects usually reuse a running dev server while iterating; `ng serve` rebuilds on change, but restart it after config or dependency changes before trusting a green run. `e2e-build` and CI never reuse a server. `E2E_BASE_URL`, set on the command line and never in `e2e/.env`, points the same specs at a deployed test environment (dev or staging), never at production; the command guard only sees what the command sets. `e2e-build` serves the production configuration from memory and writes nothing to `dist/`, so `lighthouse` always needs `build` first on this stack.
 
 `e2e/global-setup.ts` validates required env vars: throw in CI, warn locally so `--list` works without secrets. `e2e/.env.example` documents each variable, its default, and what is skipped when it is missing.
 

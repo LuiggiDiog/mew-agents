@@ -374,7 +374,7 @@ def rescore(results: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--versions", default="1.4.0,1.7.0")
+    parser.add_argument("--versions", default="1.4.0,2.0.0")
     parser.add_argument("--tasks", default="all")
     parser.add_argument("--reps", type=int, default=5)
     parser.add_argument("--model", default="sonnet")

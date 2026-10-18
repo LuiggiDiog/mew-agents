@@ -80,11 +80,11 @@ This section is the only place that names the runtime, the package manager, and 
 | `lint` | `{{CMD_LINT}}` | Lint |
 | `typecheck` | `{{CMD_TYPECHECK}}` | Type check |
 | `test` | `{{CMD_TEST}}` | Unit and component tests, single run |
-| `test-watch` | `{{CMD_TEST_WATCH}}` | Unit tests in watch mode (TDD loop) |
+| `test-watch` | `{{CMD_TEST_WATCH}}` | One unit test file in watch mode (TDD loop) |
 | `test-file` | `{{CMD_TEST_FILE}}` | One unit test file |
 | `test-related` | `{{CMD_TEST_RELATED}}` | Unit tests that cover the given source files |
 | `lint-files` | `{{CMD_LINT_FILES}}` | Lint only the given files, with cache |
-| `affected` | `node .agents/scripts/affected-tests.mjs [<base>]` | Lists the unit tests and specs that cover the touched files (uncommitted, or since `<base>`) and prints the level 2 commands; its own commands were filled in with this table |
+| `affected` | `node .agents/scripts/affected-tests.mjs [<base>]` | Lists the unit tests and specs that cover the touched files (uncommitted, or since `<base>`) and prints the level 2 commands; the commands it prints were filled in from this table when the template was applied |
 | `e2e` | `{{CMD_E2E}}` | Playwright against the dev server; append spec paths, `--list`, `--grep "<title or @tag>"`, `--only-changed`, `--last-failed`, `-x`, or `--debug` |
 | `e2e-build` | `E2E_BUILD=1 {{CMD_E2E}}` | Same, against a local production build that Playwright builds and serves itself (CI sets it through `CI`; PowerShell sets `$env:E2E_BUILD=1` first) |
 | `e2e-install` | `{{EXEC:playwright install chromium}}` | Playwright browser, once per machine |
@@ -104,7 +104,7 @@ See `docs/architecture.md` for the target layout and boundary diagram.
 - Organize by feature/domain. Keep module-specific logic inside its module; share code only when it is genuinely reusable.
 - Keep clear boundaries between UI, business logic, and data access. UI components must not call data sources directly.
 {{STACK:architecture}}
-- Keep secrets and server-only code on the server.
+- Never ship secrets or server-only code to the client.
 
 Module folders, created only when needed: `components/` (UI), `services/` (business logic and orchestration), `repositories/` (data access), `types/`, `mocks/`. Optional, only when clearly justified: `hooks/`, `utils/`, `constants/`, `schemas/`, `adapters/`, `config/`. Do not create folders just in case.
 
@@ -155,6 +155,7 @@ Test-ineligible: mechanical renames with no behavior change, comment-only, docum
 ### Test layers
 
 {{STACK:test-layers}}
+
 Setup and configuration are in `docs/testing.md`; the step-by-step loop is the `tdd-change` skill.
 <!-- END:agent-rules:tdd -->
 
@@ -163,7 +164,7 @@ Setup and configuration are in `docs/testing.md`; the step-by-step loop is the `
 
 These rules are binding; patterns, examples, and diagnosis are in `docs/e2e-playbook.md`.
 
-- E2E runs only against local or test environments (local, dev, staging), never against production; a hook blocks a base URL whose host does not look like one. Playwright owns the app server (`webServer` in `{{E2E_CONFIG}}`, dedicated port, `reuseExistingServer: false`): the dev server by default, a local production build through `e2e-build` only when production can differ (see Validation) and in CI. Test-only environment values and fake providers, never real secrets.
+- E2E runs only against local or test environments (local, dev, staging), never against production; a hook blocks a base URL whose host does not look like one. Playwright owns the app server (`webServer` in `{{E2E_CONFIG}}`, dedicated port, `reuseExistingServer: false` unless `docs/testing.md` documents the stack's exception): the dev server by default, a local production build through `e2e-build` only when production can differ (see Validation) and in CI. Test-only environment values and fake providers, never real secrets.
 - Test user-visible behavior with isolated tests; `test.describe.serial` only for true journeys. Locators by role and accessible name first, test ids before CSS, none matching several elements. Deterministic waits only, never `waitForTimeout`; assert the exact destination URL and readiness before acting.
 - Real app behavior first: mock only external, non-deterministic boundaries, for a concrete reason, and reach error states through the real path. Unique test data generated at runtime; retries only for known recoverable conflicts, 3–5 attempts.
 - Every spec is tagged with the module it covers (`{ tag: '@<module>' }`, the feature folder name). Page objects (one per page, with `assertLoaded()`) live in `{{E2E_DIR}}/pages/`, shared helpers in `{{E2E_DIR}}/helpers/`; a changed flow updates its spec, page objects, helpers, and flow docs in the same change.
@@ -180,13 +181,13 @@ Validate every change with the smallest scope that proves it. Climb one level on
 | 1. Focused | While iterating on a task | `test-file` with the test being written | `e2e` with the spec, `--grep "<title>"`, and `-x` |
 | 2. Related | Once the tasks are green, before reporting | `test-related` with the touched source files | `e2e` once, with the specs `affected` lists; `e2e-build` instead only when production can differ |
 | 3. Failed | After fixing failures found at level 2 | the failing test files | the command that failed, with `--last-failed` |
-| 4. Full | Only on explicit request; for unit tests also when test config, dependencies, or a module imported almost everywhere changed. Prefix the command with `FULL_SUITE=1`: a hook blocks full runs without it | `test` | the complete `e2e`, only on explicit request |
+| 4. Full | Only on explicit request; for unit tests also when test config, dependencies, or a module imported almost everywhere changed. Prefix the command with `FULL_SUITE=1` (PowerShell: `$env:FULL_SUITE=1;` first): a hook blocks full runs without it | `test` | the complete `e2e`, only on explicit request |
 
 - Level 2 E2E runs against the dev server. Use `e2e-build` for that single run only when the change can behave differently in a production build: routes or lazy chunks, build or bundler configuration, dependencies, assets, environment variables, or server rendering. Text, style, component, and service changes stay on the dev server, so a build is paid at most once per task and only when it proves something.
-- Level 2 starts with `affected` (with the base branch once the work is committed): it lists the unit tests the runner relates to the change, the specs Playwright relates to it, the specs tagged with each touched module, and the commands to run. Run those commands as printed, in one call per runner.
+- Level 2 always starts by running `affected` (with the base branch once the work is committed): it lists the unit tests the runner relates to the change, the specs Playwright relates to it, the specs tagged with each touched module, and the commands to run. Do not pick the selection by hand or conclude that no spec applies without running it. Run the commands it prints, one call per runner, filling any placeholder it could not resolve, and quote its selection in the report.
 - Never accept an empty selection as green. When `affected` finds no spec for a touched module, find its specs by route, page object, or visible text, run them, and report the missing tag as a follow-up.
 - Skip what the change cannot affect: documentation-only changes run no tests; style-only changes run no unit tests and are inspected; a test-only change runs only that test. Prefer automated checks; use inspection only for what no check can prove, and say so in the report.
-- Run `lighthouse` once per task, after the level 2 checks, only when the change can move a score: a new or changed route, `index.html` or the document head, images, fonts, or other assets, a client dependency, build configuration, or the layout of a route's first screen. Never for a text, control, or component change, a service, tests, or documentation. It audits a production build: reuse the one `e2e-build` just made, or run `build` first. A score under its threshold is a failure, like a red test.
+- Run `lighthouse` once per task, after the level 2 checks, only when the change can move a score: a new or changed route, `index.html` or the document head, images, fonts, or other assets, a client dependency, build configuration, or the layout of a route's first screen. Never for a text, control, or component change, a service, tests, or documentation. It audits the production build on disk: run `build` first unless `e2e-build` already wrote one (the stack note in `docs/testing.md` says whether it does). A score under its threshold is a failure, like a red test.
 - Run `lint-files` on the touched files and `typecheck` once per task, not after every edit. Do not re-run a green check unless the code it covers changed. Do not run `build` on its own unless the user asks or production behavior cannot be validated otherwise.
 - If a command cannot be run, say so and state what should be run manually. Report the level reached and why higher levels were not needed.
 <!-- END:agent-rules:validation -->

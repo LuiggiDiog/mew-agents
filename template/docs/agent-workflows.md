@@ -15,14 +15,14 @@ The primary thread (the session you talk to) is the **orchestrator**. It owns th
 | Session config  | `.claude/settings.json`             | `.codex/config.toml`            |
 | Command guard   | `hooks` in `.claude/settings.json`  | `[[hooks.PreToolUse]]` in `.codex/config.toml` |
 
-`.claude/skills` is a symlink to `.agents/skills`, so each skill is written once. Both hook entries run the same `.agents/hooks/guard.mjs` before every shell command: it denies (exit code 2, reason on stderr) a full unit or E2E suite not prefixed with `FULL_SUITE=1`, and an E2E base URL whose host is not local, dev, staging, test, QA, preview, or sandbox. Claude Code runs project hooks once the folder is trusted (and always in `-p` sessions); Codex asks to trust them once with `/hooks`. Agent profiles exist in both formats with the same instructions; when you change one, change its counterpart in the same commit.
+`.claude/skills` is a symlink to `.agents/skills`, so each skill is written once. Both hook entries run the same `.agents/hooks/guard.mjs` before every shell command: it denies (exit code 2, reason on stderr) a full unit or E2E suite not prefixed with `FULL_SUITE=1`, and an E2E base URL whose host is not local, dev, staging, test, QA, preview, or sandbox. Claude Code runs project hooks once the folder is trusted (and always in `-p` sessions); Codex asks to trust them once with `/hooks`. Both entries assume the project root is the Git root; in a monorepo package, point the hook command at the package's `.agents/hooks/guard.mjs`. Agent profiles exist in both formats with the same instructions; when you change one, change its counterpart in the same commit.
 
 ## Agent profiles
 
 | Claude Code           | Codex                 | Model (Claude / Codex)   | Use it for                                                                  |
 | --------------------- | --------------------- | ------------------------ | --------------------------------------------------------------------------- |
 | `feature-developer`   | `feature_developer`   | inherit / GPT-6 Sol high | Services, repositories, API/route logic, data access, test-first.   |
-| `product-ui`          | `product_ui`          | Sonnet / GPT-6 Luna high | Bounded React components, layout, styling, copy, accessibility.             |
+| `product-ui`          | `product_ui`          | Sonnet / GPT-6 Luna high | Bounded UI components, layout, styling, copy, accessibility.             |
 | `e2e-engineer`        | `e2e_engineer`        | inherit / GPT-6 Sol high | Playwright specs, page objects, helpers; debugging and de-flaking.          |
 | `quality-reviewer`    | `quality_reviewer`    | inherit / GPT-6 Sol high | Read-only diff review: bugs, boundaries, accessibility, missing tests.      |
 | `verification-runner` | `verification_runner` | Sonnet / GPT-6 Luna med. | Focused tests, typecheck, and lint, with clear failure reports.             |
@@ -47,7 +47,7 @@ The binding policy is the Agent orchestration section of `AGENTS.md`: the primar
 - Small task (a few edits, one layer): the primary thread does it alone. No profile is used.
 - Broad investigation across separate areas: up to 3 read-only searches in parallel, then the primary thread decides.
 - Large feature across layers: the primary thread first fixes the contract (types, route, props). Then `feature-developer` (service) and `product-ui` (component) work in parallel on disjoint files, and `e2e-engineer` joins only if the flow needs a spec. The primary thread integrates and runs the level 2 test selection once.
-- Review of a finished diff: `quality-reviewer` and `verification-runner` in parallel, both read-only on product source.
+- Review of a finished diff: `quality-reviewer` and `verification-runner` in parallel, both read-only on product source. In Codex that is enforced by `sandbox_mode = "read-only"`; in Claude Code they keep `Bash` for `git diff` and test commands and are read-only by instruction.
 - Profiles and skills never override the user's current instructions, especially on deployment, running the complete E2E suite, adding dependencies, or using paid providers.
 
 ## Context for every agent

@@ -14,8 +14,8 @@ Snippets for `{{STACK:<name>}}` markers. Each `###` section body replaces the ma
 | `{{E2E_DIR}}` / `{{E2E_CONFIG}}` | `tests/e2e` / `playwright.config.ts` |
 | `{{CMD_DEV}}` / `{{CMD_BUILD}}` | `{{RUN:dev}}` / `{{RUN:build}}` |
 | `{{CMD_LINT}}` / `{{CMD_TYPECHECK}}` | `{{RUN:lint}}` / `{{RUN:typecheck}}` |
-| `{{CMD_TEST}}` / `{{CMD_TEST_WATCH}}` / `{{CMD_TEST_FILE}}` | `{{RUN:test}}` / `{{RUN:test:watch}}` / `{{RUN:test <file>}}` |
-| `{{CMD_TEST_RELATED}}` / `{{CMD_LINT_FILES}}` | `{{EXEC:vitest related --run <files>}}` / `{{EXEC:eslint --cache <files>}}` |
+| `{{CMD_TEST}}` / `{{CMD_TEST_WATCH}}` / `{{CMD_TEST_FILE}}` | `{{RUN:test}}` / `{{RUN:test:watch <file>}}` / `{{RUN:test <file>}}` |
+| `{{CMD_TEST_RELATED}}` / `{{CMD_LINT_FILES}}` | `{{EXEC:vitest related --run <files>}}` (Jest: `{{EXEC:jest --findRelatedTests <files>}}`) / `{{EXEC:eslint --cache <files>}}` |
 | `{{CMD_TEST_LIST_CHANGED}}` | `{{EXEC:vitest list --filesOnly --changed=<base>}}` (Jest: `{{EXEC:jest --listTests --changedSince=<base>}}`) |
 | `{{CMD_E2E}}` | `{{EXEC:playwright test}}` |
 
@@ -174,7 +174,7 @@ export default defineConfig({
 });
 ```
 
-The dedicated port avoids clashing with the `dev` command on 3000. Only `e2e-build` and CI pay for the build; caching and rendering can differ between dev and production, which is why the final run uses `e2e-build`.
+The dedicated port avoids clashing with the `dev` command on 3000. `e2e-build` runs `next build`, so `lighthouse` can reuse that build. Only `e2e-build` and CI pay for the build; caching and rendering can differ between dev and production, which is why the final run uses `e2e-build`.
 
 `package.json` scripts and `engines`:
 

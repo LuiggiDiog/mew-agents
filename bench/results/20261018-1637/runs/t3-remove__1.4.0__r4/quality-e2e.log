@@ -1,0 +1,36 @@
+
+
+
+
+Running 22 tests using 7 workers
+
+[1/22] [chromium] › e2e/tests/cart-empty.spec.ts:18:5 › empty cart › leaves the empty state after adding Tea @cart
+[2/22] [chromium] › e2e/tests/cart-empty.spec.ts:18:5 › empty cart › leaves the empty state after adding Cake @cart
+[3/22] [chromium] › e2e/tests/cart-empty.spec.ts:18:5 › empty cart › leaves the empty state after adding Coffee @cart
+[4/22] [chromium] › e2e/tests/cart.spec.ts:12:5 › cart › adds Coffee and shows the total @cart
+[5/22] [chromium] › e2e/tests/cart.spec.ts:12:5 › cart › adds Tea and shows the total @cart
+[6/22] [chromium] › e2e/tests/cart-empty.spec.ts:5:3 › empty cart › starts empty @cart
+[7/22] [chromium] › e2e/tests/cart-empty.spec.ts:11:3 › empty cart › hides the total while empty @cart
+[8/22] [chromium] › e2e/tests/cart.spec.ts:12:5 › cart › adds Cake and shows the total @cart
+[9/22] [chromium] › e2e/tests/cart.spec.ts:21:3 › cart › groups repeated products in one row @cart
+[10/22] [chromium] › e2e/tests/cart.spec.ts:29:3 › cart › sums different products @cart
+[11/22] [chromium] › e2e/tests/cart.spec.ts:37:3 › cart › removes one unit per click @cart
+[12/22] [chromium] › e2e/tests/cart.spec.ts:46:3 › cart › drops the row when the last unit is removed @cart
+[13/22] [chromium] › e2e/tests/catalog-accessibility.spec.ts:5:3 › catalog accessibility › has a page heading and a products heading @catalog
+[14/22] [chromium] › e2e/tests/cart.spec.ts:56:3 › cart › shows the empty state after removing the only item @cart
+[15/22] [chromium] › e2e/tests/catalog-accessibility.spec.ts:12:5 › catalog accessibility › Coffee has a reachable add button @catalog
+[16/22] [chromium] › e2e/tests/catalog-accessibility.spec.ts:12:5 › catalog accessibility › Tea has a reachable add button @catalog
+[17/22] [chromium] › e2e/tests/catalog-accessibility.spec.ts:12:5 › catalog accessibility › Cake has a reachable add button @catalog
+[18/22] [chromium] › e2e/tests/catalog.spec.ts:11:3 › catalog › lists every product @catalog
+[19/22] [chromium] › e2e/tests/catalog.spec.ts:17:5 › catalog › shows the price of Coffee @catalog
+[20/22] [chromium] › e2e/tests/catalog.spec.ts:17:5 › catalog › shows the price of Tea @catalog
+[21/22] [chromium] › e2e/tests/catalog.spec.ts:17:5 › catalog › shows the price of Cake @catalog
+[22/22] [chromium] › e2e/tests/zz-hidden.spec.ts:3:1 › hidden: remove takes one unit at a time
+  22 passed (10.9s)
+[WebServer] $ vite build
+[WebServer] [PLUGIN_TIMINGS] JavaScript callbacks ran for 8.0s of this 8.1s build (99%).
+[WebServer] The slowest callbacks, timed inside each callback (the wait before a callback starts is excluded, the time it awaits is included):
+[WebServer]   - plugin production-build-cost buildStart (99%, 8.0s, 1 call)
+[WebServer] See https://rolldown.rs/reference/InputOptions.checks#bundlertimings for more details.
+[WebServer] 
+[WebServer] $ vite preview --port 4781 --strictPort

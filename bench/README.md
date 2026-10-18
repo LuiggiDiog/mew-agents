@@ -13,7 +13,7 @@ Measures whether a template version makes an agent faster without losing quality
   - `t3-remove` (medium, ambiguous): the canned answer contradicts the natural default, so an agent that does not ask fails the hidden test.
   - `t4-currency` (small, scope trap): the formatter lives in `cart` but `catalog` uses it, so `@catalog` specs break without any catalog file changing. Selecting E2E specs only by the touched module's tag misses them.
 - **Rendering** (`render.py`): fills the template at a git ref (or the working tree) deterministically, with the values in `versions.json`. A benchmark therefore measures the rules, not the variance of an agent applying them. Each version also gets the Playwright config its stack file prescribes (`variants/`).
-- **Running** (`run.py`): the versions of each (task, repetition) are submitted together and pairs run concurrently (`--jobs`, default 6), on APFS clones of one installed fixture, so CPU contention is symmetric between versions. Each run calls `claude -p` headless with the same model, no MCP servers, and no user settings. If the agent finishes without changing files, it asked something: the runner answers with the canned answer (up to 2 rounds) and counts the round trip.
+- **Running** (`run.py`): the versions of each (task, repetition) are submitted together and pairs run concurrently (`--jobs`, default 6), on APFS clones of one installed fixture, so CPU contention is symmetric between versions. Each run calls `claude -p` headless with the same model, no MCP servers, and no user settings; project settings do load, so from 2.0.0 the rendered `.claude/settings.json` runs the command guard hook inside the benchmark. If the agent finishes without changing files, it asked something: the runner answers with the canned answer (up to 2 rounds) and counts the round trip.
 - **Quality**: after the agent finishes, the runner (not the agent) adds the hidden tests and runs, in parallel, one Vitest pass, one Playwright pass against a production build (JSON reporters split visible from hidden results), typecheck, and lint.
 - **Report** (`report.py`): writes `results/<stamp>/REPORT.md` with a summary per version and a table by task and version.
 
@@ -39,9 +39,9 @@ A version is better only if speed improves and quality stays equal or better. Fa
 ## Run it
 
 ```bash
-python3 bench/run.py                          # all tasks, v1.4.0 vs v1.7.0 (working tree), 5 repetitions, Sonnet, 6 runs at a time
+python3 bench/run.py                          # all tasks, v1.4.0 vs v2.0.0 (working tree), 5 repetitions, Sonnet, 6 runs at a time
 python3 bench/run.py --reps 5 --model opus    # more repetitions for less noise
-python3 bench/run.py --tasks t2-total --versions 1.7.0
+python3 bench/run.py --tasks t2-total --versions 2.0.0
 python3 bench/run.py --rescore bench/results/<stamp>   # recompute metrics from saved transcripts
 python3 bench/report.py                       # rebuild the latest REPORT.md
 ```

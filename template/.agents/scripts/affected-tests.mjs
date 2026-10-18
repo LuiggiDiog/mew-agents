@@ -4,7 +4,7 @@
 // committed since. The commands it embeds were filled in when the template was applied (see Toolchain).
 import { execSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, sep } from 'node:path';
 
 const BASE = process.argv[2] ?? 'HEAD';
 const E2E_DIR = '{{E2E_DIR}}';
@@ -19,11 +19,13 @@ const sh = (cmd) => {
     return error.stdout ?? '';
   }
 };
-const lines = (text) => text.split('\n').map((l) => l.trim()).filter(Boolean);
+const slashes = (p) => p.split(sep).join('/').replace(/\\/g, '/');
+const lines = (text) => text.split('\n').map((l) => slashes(l.trim())).filter(Boolean);
 const isUnitTest = (f) => /\.(test|spec)\.[cm]?[jt]sx?$/.test(f) && !f.startsWith(E2E_DIR);
 const isCode = (f) => /\.([cm]?[jt]sx?|vue|svelte|html|css|scss)$/.test(f) && !f.startsWith('.'); // dot folders hold agent config, not app code
 
-const touched = [...new Set([...lines(sh(`git diff --name-only ${BASE} --`)), ...lines(sh('git ls-files --others --exclude-standard'))])]
+// --relative keeps paths relative to the current directory (a package inside a monorepo).
+const touched = [...new Set([...lines(sh(`git diff --name-only --relative ${BASE} --`)), ...lines(sh('git ls-files --others --exclude-standard'))])]
   .filter((f) => existsSync(f));
 const source = touched.filter((f) => isCode(f) && !isUnitTest(f) && !f.startsWith(E2E_DIR));
 const changedUnitTests = touched.filter(isUnitTest);
@@ -35,13 +37,14 @@ const walk = (dir) => {
   for (const name of readdirSync(dir)) {
     const path = join(dir, name);
     if (statSync(path).isDirectory()) walk(path);
-    else if (/\.spec\.[cm]?[jt]sx?$/.test(name)) specs.push(path);
+    else if (/\.spec\.[cm]?[jt]sx?$/.test(name)) specs.push(slashes(path));
   }
 };
 walk(E2E_DIR);
-const tagsOf = (spec) => [...readFileSync(spec, 'utf8').matchAll(/@([\w-]+)/g)].map((m) => m[1]);
+// Only Playwright tags count: `{ tag: '@cart' }` or `{ tag: ['@cart', '@checkout'] }`, not imports or JSDoc.
+const tagsOf = (spec) => [...readFileSync(spec, 'utf8').matchAll(/\btag:\s*(\[[^\]]*\]|'[^']*'|"[^"]*")/g)].flatMap((m) => [...m[1].matchAll(/@([\w-]+)/g)].map((t) => t[1]));
 const allTags = new Set(specs.flatMap(tagsOf));
-const segments = (f) => dirname(f).split('/').filter(Boolean);
+const segments = (f) => dirname(f).split(/[\\/]/).filter(Boolean);
 // Unit tests the runner relates to the change through imports: a module whose tests react to the
 // change is affected even when none of its files changed (a shared helper used by another module).
 const unitFiles = UNIT_LIST === 'n/a' ? null : lines(sh(UNIT_LIST.replace('<base>', BASE))).filter((l) => /\.(test|spec)\.[cm]?[jt]sx?$/.test(l));
@@ -52,7 +55,7 @@ const taggedSpecs = specs.filter((spec) => tagsOf(spec).some((t) => modules.incl
 // Specs Playwright itself relates to the change (changed specs, page objects, helpers).
 const specPath = (printed) => [printed, join(dirname(E2E_DIR), printed), join(E2E_DIR, printed)].find((p) => existsSync(p)) ?? printed;
 const changedSpecs = [...new Set(lines(sh(`${E2E} --list --only-changed=${BASE}`))
-  .map((l) => l.match(/([\w./-]+\.spec\.[cm]?[jt]sx?)/)?.[1]).filter(Boolean).map(specPath))];
+  .map((l) => l.match(/([\w./-]+\.spec\.[cm]?[jt]sx?)/)?.[1]).filter(Boolean).map((p) => slashes(specPath(p))))];
 const e2eSelection = [...new Set([...changedSpecs, ...taggedSpecs])];
 
 const show = (title, items) => console.log(`${title}: ${items.length ? items.join(' ') : '(none)'}`);
@@ -66,8 +69,15 @@ show('E2E specs Playwright relates to the change', changedSpecs);
 show('E2E specs tagged with the touched modules', taggedSpecs);
 
 console.log('\nLevel 2 commands:');
-if (source.length) {
-  console.log(`  ${UNIT_RELATED.includes('<files>') ? UNIT_RELATED.replace('<files>', source.join(' ')) : `${UNIT_RELATED}   # with the specs of: ${source.join(' ')}`}`);
+if (source.length && UNIT_RELATED.includes('<files>')) {
+  console.log(`  ${UNIT_RELATED.replace('<files>', source.join(' '))}`);
+} else if (source.length) {
+  // Runners without an import graph (Karma): expand `<spec>` with the touched files' own specs.
+  const own = source.map((f) => f.replace(/\.[cm]?[jt]sx?$/, '.spec.ts')).filter((f) => existsSync(f));
+  const flag = UNIT_RELATED.match(/(\S*)<spec>/)?.[1] ?? '';
+  const command = UNIT_RELATED.replace(/(\s*\S*<spec>)+/, own.map((f) => ` ${flag}${f}`).join(''));
+  console.log(`  ${command}`);
+  console.log(`  # the runner cannot relate tests to changes: add the specs of the files that import ${source.join(', ')}`);
 } else if (changedUnitTests.length) {
   console.log(`  test-file with: ${changedUnitTests.join(' ')}`);
 } else {

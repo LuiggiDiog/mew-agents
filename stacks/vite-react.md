@@ -14,7 +14,7 @@ Snippets for `{{STACK:<name>}}` markers. Based on a Vite + React single-page app
 | `{{E2E_DIR}}` / `{{E2E_CONFIG}}` | `e2e/tests` / `e2e/playwright.config.ts` |
 | `{{CMD_DEV}}` / `{{CMD_BUILD}}` | `{{RUN:dev}}` / `{{RUN:build}}` |
 | `{{CMD_LINT}}` / `{{CMD_TYPECHECK}}` | `{{RUN:lint}}` / `{{EXEC:tsc --noEmit --incremental}}` (verify: `{{EXEC:tsc -b}}` with project references; `n/a` in a JavaScript project) |
-| `{{CMD_TEST}}` / `{{CMD_TEST_WATCH}}` / `{{CMD_TEST_FILE}}` | `{{EXEC:vitest run}}` / `{{RUN:test}}` / `{{EXEC:vitest run <file>}}` |
+| `{{CMD_TEST}}` / `{{CMD_TEST_WATCH}}` / `{{CMD_TEST_FILE}}` | `{{EXEC:vitest run}}` / `{{EXEC:vitest <file>}}` / `{{EXEC:vitest run <file>}}` |
 | `{{CMD_TEST_RELATED}}` / `{{CMD_LINT_FILES}}` | `{{EXEC:vitest related --run <files>}}` / `{{EXEC:eslint --cache <files>}}` |
 | `{{CMD_TEST_LIST_CHANGED}}` | `{{EXEC:vitest list --filesOnly --changed=<base>}}` |
 | `{{CMD_E2E}}` | `{{EXEC:playwright test --config=e2e/playwright.config.ts}}` |
@@ -71,7 +71,8 @@ src/
 e2e/
   playwright.config.ts
   tsconfig.json
-  fixtures/  helpers/  pages/  tests/
+  tests/
+    fixtures/  helpers/  pages/   # page objects and helpers live with the specs ({{E2E_DIR}})
 docs/
 ```
 
@@ -144,7 +145,7 @@ export default defineConfig({
 });
 ```
 
-Iteration runs against the Vite dev server; `e2e-build` and CI build and serve with `vite preview`. With `reuseExistingServer: false`, neither ever tests a stale server. Set `VITE_E2E_BASE_URL` to point the same specs at a deployed test environment (dev or staging), never at production. Specs that run against a shared backend with real data should set `workers: 1` and avoid parallelism.
+Iteration runs against the Vite dev server; `e2e-build` and CI build and serve with `vite preview`. With `reuseExistingServer: false`, neither ever tests a stale server. Set `VITE_E2E_BASE_URL` on the command line to point the same specs at a deployed test environment (dev or staging), never at production, and never in the dotenv file: the command guard only sees what the command sets. `e2e-build` builds to `dist/`, so `lighthouse` can reuse that build. Specs that run against a shared backend with real data should set `workers: 1` and avoid parallelism.
 
 `package.json` scripts:
 
