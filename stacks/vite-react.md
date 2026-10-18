@@ -114,7 +114,7 @@ config({ path: '.env' }); // Playwright runs from the repo root
 const PORT = 4173;
 const BASE_URL = process.env.VITE_E2E_BASE_URL ?? `http://localhost:${PORT}`;
 const isRemote = Boolean(process.env.VITE_E2E_BASE_URL);
-const PROD = Boolean(process.env.CI || process.env.E2E_PROD);
+const PROD = Boolean(process.env.CI || process.env.E2E_BUILD);
 
 export default defineConfig({
   testDir: './tests',
@@ -132,7 +132,7 @@ export default defineConfig({
   webServer: isRemote
     ? undefined
     : {
-        // Iteration runs against the dev server; e2e-prod and CI against the production build.
+        // Iteration runs against the dev server; e2e-build and CI against the production build.
         command: PROD
           ? `{{RUN:build}} && {{RUN:preview --port ${PORT} --strictPort}}`
           : `{{RUN:dev --port ${PORT} --strictPort}}`,
@@ -143,7 +143,7 @@ export default defineConfig({
 });
 ```
 
-Iteration runs against the Vite dev server; `e2e-prod` and CI build and serve with `vite preview`. With `reuseExistingServer: false`, neither ever tests a stale server. Set `VITE_E2E_BASE_URL` to point the same specs at a deployed environment. Specs that run against a shared backend with real data should set `workers: 1` and avoid parallelism.
+Iteration runs against the Vite dev server; `e2e-build` and CI build and serve with `vite preview`. With `reuseExistingServer: false`, neither ever tests a stale server. Set `VITE_E2E_BASE_URL` to point the same specs at a deployed test environment (dev or staging), never at production. Specs that run against a shared backend with real data should set `workers: 1` and avoid parallelism.
 
 `package.json` scripts:
 

@@ -71,8 +71,21 @@
       }
     },
     "1.6.1": {
-      "ref": "WORKTREE",
+      "ref": "54cac41",
       "playwright": "dev-prod",
+      "vars": {
+        "PM_LOCKFILE": "pnpm-lock.yaml",
+        "PM_INSTALL": "pnpm install",
+        "PM_ADD": "pnpm add",
+        "PM_ADD_DEV": "pnpm add -D",
+        "CMD_TYPECHECK": "pnpm exec tsc --noEmit --incremental",
+        "CMD_TEST_RELATED": "pnpm exec vitest related --run <files>",
+        "CMD_LINT_FILES": "pnpm exec eslint --cache <files>"
+      }
+    },
+    "1.7.0": {
+      "ref": "WORKTREE",
+      "playwright": "dev-build",
       "vars": {
         "PM_LOCKFILE": "pnpm-lock.yaml",
         "PM_INSTALL": "pnpm install",

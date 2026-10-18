@@ -54,6 +54,7 @@ ROWS = [
     ("Full unit suite runs (total)", lambda rs: sum(r["unit_full"] for r in rs), True),
     ("Full E2E suite runs (total; forbidden without a request)", lambda rs: sum(r["e2e_full"] for r in rs), True),
     ("E2E runs paying a production build (mean)", lambda rs: mean([r["e2e_prod_runs"] for r in rs]), True),
+    ("Repeated file reads with no edit in between (mean)", lambda rs: mean([r.get("repeated_reads", 0) for r in rs]), True),
     ("Subagents spawned (total)", lambda rs: sum(r["subagents"] for r in rs), None),
 ]
 

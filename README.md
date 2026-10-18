@@ -44,5 +44,6 @@ The agent discovers the stack, fills the variables, copies or merges the files, 
 - Package-manager agnostic: template and stack files never name a package manager. They use the `{{PM*}}` variables and the `{{RUN:…}}`, `{{EXEC:…}}`, `{{DLX:…}}` forms defined in `APPLY.md`, and in each project only the Toolchain block of `AGENTS.md` holds the resolved commands.
 - Invariant rules live in `template/`; anything that depends on the framework lives in `stacks/` under `### <snippet>` headings that `APPLY.md` maps to `{{STACK:<snippet>}}` markers.
 - Efficiency without losing quality: each rule lives in one place, agents read only what the task needs, tests climb a selection ladder instead of running full suites, and extra agents are used only when they finish the work sooner.
+- `AGENTS.md` stays short (about 140 content lines once rendered): binding rules only, with checklists and procedures in skills and docs that load on demand. E2E runs only against local or test environments, never production.
 - The benchmark in `bench/` runs only when the maintainer explicitly asks for it. Agents never run it on their own, as a validation step, or as part of a release.
 - Never put domain rules in the template. They belong to each project's own area in `AGENTS.md` and `docs/context/`.

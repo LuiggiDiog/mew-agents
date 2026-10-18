@@ -6,7 +6,7 @@ Measures whether a template version makes an agent faster without losing quality
 
 ## How it works
 
-- **Fixture** (`fixture/`): a small Vite + React + TypeScript shop with Vitest (9 tests), Playwright (18 tests tagged `@catalog` and `@cart`), and ESLint, installed with pnpm from a committed lockfile. The production build carries a fixed 8 s cost, so runs that pay for a build cost what they would in a real project. Problems are seeded for the tasks: a UI typo, a cart total that ignores quantity, no way to remove items, and a price formatter shared across modules.
+- **Fixture** (`fixture/`): a small Vite + React + TypeScript shop with Vitest (9 tests), Playwright (18 tests tagged `@catalog` and `@cart`), ESLint, and `@lhci/cli`, installed with pnpm from a committed lockfile. The production build carries a fixed 8 s cost, so runs that pay for a build cost what they would in a real project. Problems are seeded for the tasks: a UI typo, a cart total that ignores quantity, no way to remove items, and a price formatter shared across modules.
 - **Tasks** (`tasks/<id>/task.json`): each has a prompt, a canned answer used if the agent asks questions, and hidden acceptance tests the agent never sees.
   - `t1-typo` (trivial): fix a UI typo that existing tests also contain.
   - `t2-total` (small): fix a bug test-first.
@@ -30,15 +30,16 @@ Measures whether a template version makes an agent faster without losing quality
 | Question rounds | Runs that ended without changes and needed the canned answer | Lower, unless the task is ambiguous |
 | Focused versus full unit and E2E runs, production builds paid | Shell commands in the transcript | Fewer full runs and builds |
 | Full E2E suite runs | Same | 0: every version forbids it without a request |
+| Repeated file reads with no edit in between | `Read` calls and `cat`/`head`/`tail`/`sed -n` in the transcript | Lower |
 
 A version is better only if speed improves and quality stays equal or better. Faster with lower quality is a regression.
 
 ## Run it
 
 ```bash
-python3 bench/run.py                          # all tasks, v1.2.0 vs v1.6.1, 3 repetitions, Sonnet, 6 runs at a time
+python3 bench/run.py                          # all tasks, v1.4.0 vs v1.7.0 (working tree), 5 repetitions, Sonnet, 6 runs at a time
 python3 bench/run.py --reps 5 --model opus    # more repetitions for less noise
-python3 bench/run.py --tasks t2-total --versions 1.6.1
+python3 bench/run.py --tasks t2-total --versions 1.7.0
 python3 bench/run.py --rescore bench/results/<stamp>   # recompute metrics from saved transcripts
 python3 bench/report.py                       # rebuild the latest REPORT.md
 ```
@@ -49,6 +50,6 @@ To add a version, add it to `versions.json` with its git ref (or `WORKTREE`), it
 
 ## Limits
 
-- Agent runs vary: with 3 repetitions, a difference under about 20% in time or cost is noise.
+- Agent runs vary: with 5 repetitions, a difference under about 20% in time or cost is noise. Before calling a quality regression confirmed on `t3-remove` or `t4-currency`, run those tasks with `--reps 8`.
 - One stack (Vite + React) and four tasks. Next.js server-side behavior, Angular, Codex, and the multi-agent policy (no task is large enough to justify delegation) are not exercised yet.
 - Test-first detection reads the order of edits and test runs in the transcript, including `sed -i` and heredoc scripts that write files; an edit made some other way can be missed.

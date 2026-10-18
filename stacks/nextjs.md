@@ -143,7 +143,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 const PORT = 3107;
 const BASE_URL = `http://127.0.0.1:${PORT}`;
-const PROD = Boolean(process.env.CI || process.env.E2E_PROD);
+const PROD = Boolean(process.env.CI || process.env.E2E_BUILD);
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -159,7 +159,7 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    // Iteration runs against the dev server; e2e-prod and CI against a production build.
+    // Iteration runs against the dev server; e2e-build and CI against a production build.
     command: PROD
       ? `{{RUN:build}} && {{RUN:start --hostname 127.0.0.1 --port ${PORT}}}`
       : `{{RUN:dev --hostname 127.0.0.1 --port ${PORT}}}`,
@@ -173,7 +173,7 @@ export default defineConfig({
 });
 ```
 
-The dedicated port avoids clashing with the `dev` command on 3000. Only `e2e-prod` and CI pay for the build; caching and rendering can differ between dev and production, which is why the final run uses `e2e-prod`.
+The dedicated port avoids clashing with the `dev` command on 3000. Only `e2e-build` and CI pay for the build; caching and rendering can differ between dev and production, which is why the final run uses `e2e-build`.
 
 `package.json` scripts and `engines`:
 
@@ -203,8 +203,8 @@ The dedicated port avoids clashing with the `dev` command on 3000. Only `e2e-pro
 | --- | --- | --- |
 | `page.route` mock has no effect | Request is made on the Next.js server | Fake through `webServer.env` or a fake adapter |
 | Click does nothing right after load | Interaction before hydration | Assert a hydrated-only state first |
-| `webServer` dev command exits at startup | Another `next dev` already runs for the project | Stop it, or run `e2e-prod` |
-| Passes with `e2e`, fails with `e2e-prod` | Behavior differs between dev and production (caching, static rendering) | Fix for production; `e2e-prod` is the reference |
+| `webServer` dev command exits at startup | Another `next dev` already runs for the project | Stop it, or run `e2e-build` |
+| Passes with `e2e`, fails with `e2e-build` | Behavior differs between dev and production (caching, static rendering) | Fix for production; `e2e-build` is the reference |
 
 ### performance
 

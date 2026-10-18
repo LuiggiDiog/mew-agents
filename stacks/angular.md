@@ -105,7 +105,7 @@ config({ path: `${__dirname}/.env` }); // credentials and base URL; never commit
 
 const BASE_URL = process.env.E2E_BASE_URL ?? 'http://localhost:4200';
 const isRemote = Boolean(process.env.E2E_BASE_URL);
-const PROD = Boolean(process.env.CI || process.env.E2E_PROD);
+const PROD = Boolean(process.env.CI || process.env.E2E_BUILD);
 
 export default defineConfig({
   testDir: './tests',
@@ -127,7 +127,7 @@ export default defineConfig({
   webServer: isRemote
     ? undefined
     : {
-        // Iteration uses the dev configuration; e2e-prod and CI serve the production one. No -o: do not open a browser.
+        // Iteration uses the dev configuration; e2e-build and CI serve the production one. No -o: do not open a browser.
         command: PROD ? '{{EXEC:ng serve --configuration production}}' : '{{EXEC:ng serve}}',
         port: 4200,
         reuseExistingServer: !PROD, // ng serve's first compile is slow; see note below
@@ -136,7 +136,7 @@ export default defineConfig({
 });
 ```
 
-Note on `reuseExistingServer`: the template rule prefers `false` so a stale server is never tested. The first `ng serve` compile is slow, so Angular projects usually reuse a running dev server while iterating; `ng serve` rebuilds on change, but restart it after config or dependency changes before trusting a green run. `e2e-prod` and CI never reuse a server.
+Note on `reuseExistingServer`: the template rule prefers `false` so a stale server is never tested. The first `ng serve` compile is slow, so Angular projects usually reuse a running dev server while iterating; `ng serve` rebuilds on change, but restart it after config or dependency changes before trusting a green run. `e2e-build` and CI never reuse a server. `E2E_BASE_URL` points the same specs at a deployed test environment (dev or staging), never at production.
 
 `e2e/global-setup.ts` validates required env vars: throw in CI, warn locally so `--list` works without secrets. `e2e/.env.example` documents each variable, its default, and what is skipped when it is missing.
 

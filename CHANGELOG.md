@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.7.0 — 2026-10-18
+
+Driven by the six-version benchmark (`bench/results/20261018-1500`): 1.6.1 kept quality but was 30% slower than 1.4.0, because Lighthouse ran for small UI changes and level 2 E2E paid a production build for text and service changes; the ambiguous task was asked about in 3 of 5 runs against 5 of 5 on 1.3.0 and 1.4.0 with the same rule, in a file 30% longer.
+
+- `validation`: level 2 E2E runs against the dev server; the production build is paid only when the change can behave differently in production (routes or lazy chunks, build configuration, dependencies, assets, environment variables, server rendering). `lighthouse` runs only when the change can move a score (routes, `index.html` or the document head, assets, client dependencies, build configuration, first-screen layout), never for a text, control, component, service, test, or documentation change.
+- `e2e` and all docs: E2E runs only against local or test environments (local, dev, staging), never against production. The `e2e-prod` command is now `e2e-build` and its switch `E2E_BUILD`, to say what it is: a local production build that Playwright builds and serves.
+- `lighthouse` runs the installed `@lhci/cli` (`{{EXEC:lhci autorun}}`) instead of downloading it on every run through `dlx`; `APPLY.md` adds the dev dependency when tooling is installed, or lists it as a follow-up. The `web-performance` skill falls back to `dlx` once when it is missing.
+- `requirements`: a question is open only when the answer changes what the user sees or the scope; details that patterns or an obvious default settle are assumed and stated in the report.
+- `tdd`: the failing test runs before any source file is touched, also when the edit is a `sed` or a script that writes tests and source together.
+- `AGENTS.md` trimmed from 272 to about 215 rendered lines (3568 to about 3330 words): the Lighthouse checklist and `{{STACK:performance}}` moved to the `web-performance` skill, E2E detail stays in `docs/e2e-playbook.md`, the package-manager table became one line, and `architecture`, `working-style`, `documentation`, `tdd`, and `orchestration` say the same in fewer lines. Path-scoped rules were considered and not adopted: Codex loads nested `AGENTS.md` by working directory, not by touched file, so a split would leave Codex without the rules.
+- `APPLY.md`: optional `/doctor prompt-audit` in the verify step (Claude Code 2.1.283 or later); the apply never runs E2E against a deployed environment; re-apply updates `E2E_PROD` to `E2E_BUILD`.
+- Benchmark: `versions.json` registers 1.0.0, 1.2.0, 1.3.0, 1.4.0, 1.5.0, 1.6.1, and 1.7.0; the runner refuses to start below Node 22 (Vitest 5 runs no tests on Node 20 and every unit result read as failed), saves each quality check's output, counts repeated file reads, and compares 1.4.0 (the best measured version) with the working tree by default. The fixture installs `@lhci/cli`.
+
 ## 1.6.1 — 2026-10-18
 
 - `commits`: never add AI or tool attribution to commits or pull requests (`Co-Authored-By` naming an AI, "Generated with" lines, tool links, robot emoji), overriding tool defaults; human co-authors only on request.

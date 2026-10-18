@@ -9,6 +9,7 @@ How to design, write, stabilize, and maintain end-to-end tests in this repositor
 3. Use deterministic waits (auto-retrying `expect`, `waitForURL`, explicit state checks). Never synchronize with `waitForTimeout`.
 4. Real app behavior first. Mock only external, non-deterministic boundaries, and only for a concrete reason.
 5. Keep specs, page objects, and flow documentation in sync.
+6. Run only against local or test environments (local, dev, staging). Never point a spec at production.
 
 ## 2. Before writing a spec
 
@@ -236,7 +237,7 @@ Follow the test selection ladder in `AGENTS.md` (Validation). For E2E it means:
 
 1. `e2e --list` after structural edits.
 2. While iterating: the changed spec with `--grep "<title>"` and `-x`, against the dev server.
-3. Before reporting, once: `e2e-prod` with the union of spec files from `e2e --list --only-changed` and from `grep -rl "@<module>"` for each touched module, passed as explicit paths (both filters in one command intersect). Use `--only-changed=<base>` when the work is committed; if a touched module has no tagged spec, find its specs by route, page object, or visible text. An empty selection is never green.
+3. Before reporting, once, against the dev server (`e2e-build` only when the change can behave differently in a production build: routes, build configuration, dependencies, assets, environment variables, server rendering): the union of spec files from `e2e --list --only-changed` and from `grep -rl "@<module>"` for each touched module, passed as explicit paths (both filters in one command intersect). Use `--only-changed=<base>` when the work is committed; if a touched module has no tagged spec, find its specs by route, page object, or visible text. An empty selection is never green.
 4. After fixing failures: the command that failed, with `--last-failed`.
 5. The complete suite only when the user asks for it.
 
@@ -267,5 +268,5 @@ On failure: open the trace first, then capture the URL, visible blockers, and co
 - [ ] Exact URL assertions; no bridge-only tests.
 - [ ] Flows with a mobile concern have a `*.mobile.spec.ts` with overflow and target checks at the agreed widths.
 - [ ] Tagged with the module it covers (`@<module>`).
-- [ ] Validated with `--list`, then the ladder: targeted spec on the dev server, final run with `e2e-prod`.
+- [ ] Validated with `--list`, then the ladder: targeted spec while iterating, the level 2 selection once (`e2e-build` only when production can differ).
 - [ ] Flow docs updated in the same change.

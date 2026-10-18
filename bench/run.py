@@ -141,7 +141,7 @@ def classify(command: str, variant: str) -> list[str]:
                 labels.append("e2e_list")
                 continue
             focused = re.search(r"\.spec\.ts|--grep|-g |--only-changed|--last-failed|zz-|\$\(|`|tests/\S", part)
-            prod = variant == "prod-always" or "E2E_PROD" in part or "CI=" in part
+            prod = variant == "prod-always" or "E2E_PROD" in part or "E2E_BUILD" in part or "CI=" in part
             labels.append(f"e2e_{'focused' if focused else 'full'}_{'prod' if prod else 'dev'}")
         elif "vitest" in part or re.search(r"\b(pnpm|npm|yarn)( run)? test\b", part):
             if "watch" in part:
@@ -169,6 +169,7 @@ def tests_in_output(text: str) -> tuple[int, int]:
 
 def transcript_metrics(events: list[dict], variant: str) -> dict:
     tool_calls, commands, edits, labels, subagents, seq = 0, [], [], [], 0, 0
+    reads: list[tuple[int, str]] = []
     pending: dict[str, tuple[float, list[str]]] = {}
     check_s = unit_tests = e2e_tests = 0.0
     for event in events:
@@ -219,6 +220,13 @@ def transcript_metrics(events: list[dict], variant: str) -> dict:
                 pending[block.get("id", "")] = (event.get("_t", 0.0), kinds)
             elif name in ("Edit", "Write", "MultiEdit", "NotebookEdit"):
                 edits.append((seq, data.get("file_path", "")))
+            elif name == "Read":
+                reads.append((seq, data.get("file_path", "")))
+        if name == "Bash":
+            # cat/head/tail/sed -n on a source or test file count as reads too.
+            for part in re.split(r"\n|&&|\|\||;", data.get("command", "")):
+                if re.match(r"\s*(cat|head|tail|sed -n|bat)\b", part):
+                    reads += [(seq, f"/{path}") for path in re.findall(r"[\w./-]+\.(?:tsx?|jsx?|css|md|json)\b", part)]
     is_test = lambda p: bool(re.search(r"\.test\.|\.spec\.|/e2e/", p))
     is_src = lambda p: "/src/" in p and not is_test(p)
     first_test = next((i for i, p in edits if is_test(p)), None)
@@ -229,6 +237,12 @@ def transcript_metrics(events: list[dict], variant: str) -> dict:
         for i, l in labels
     )
     count = lambda prefix: sum(1 for _, l in labels if l.startswith(prefix))
+    repeated_reads, last_read = 0, {}
+    for at, path in sorted(reads):
+        name = path.rsplit("/", 1)[-1]
+        if name in last_read and not any(last_read[name] < i < at and p.endswith(name) for i, p in edits):
+            repeated_reads += 1
+        last_read[name] = at
     return {
         "tool_calls": tool_calls, "bash_commands": len(commands), "edits": len(edits), "subagents": subagents,
         "unit_focused": count("unit_focused"), "unit_full": count("unit_full"),
@@ -237,7 +251,7 @@ def transcript_metrics(events: list[dict], variant: str) -> dict:
         "builds": count("build"), "typecheck": count("typecheck"), "lint": count("lint"),
         "unit_tests_executed": int(unit_tests), "e2e_tests_executed": int(e2e_tests),
         "check_time_s": round(check_s, 1),
-        "test_first": test_first, "red_seen": red_seen, "commands": commands,
+        "test_first": test_first, "red_seen": red_seen, "repeated_reads": repeated_reads, "commands": commands,
     }
 
 
@@ -253,7 +267,7 @@ def quality(ws: Path, logs: Path, task: dict, port: int) -> dict:
         "unit": (f"pnpm exec vitest run --reporter=json --outputFile={unit_json}", {}),
         "typecheck": ("pnpm exec tsc --noEmit", {}),
         "lint": ("pnpm exec eslint --ignore-pattern '**/zz-hidden.*' .", {}),
-        "e2e": (f"{E2E} --reporter=json", {"E2E_PORT": str(port), "E2E_PROD": "1", "PLAYWRIGHT_JSON_OUTPUT_NAME": str(e2e_json)}),
+        "e2e": (f"{E2E} --reporter=json", {"E2E_PORT": str(port), "E2E_PROD": "1", "E2E_BUILD": "1", "PLAYWRIGHT_JSON_OUTPUT_NAME": str(e2e_json)}),
     }
     with futures.ThreadPoolExecutor(len(commands)) as pool:
         jobs = {name: pool.submit(sh, cmd, ws, env) for name, (cmd, env) in commands.items()}
@@ -349,9 +363,9 @@ def rescore(results: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--versions", default="1.2.0,1.6.1")
+    parser.add_argument("--versions", default="1.4.0,1.7.0")
     parser.add_argument("--tasks", default="all")
-    parser.add_argument("--reps", type=int, default=3)
+    parser.add_argument("--reps", type=int, default=5)
     parser.add_argument("--model", default="sonnet")
     parser.add_argument("--jobs", type=int, default=6, help="concurrent runs; versions of one (task, rep) start together")
     parser.add_argument("--workdir", default=str(Path(tempfile.gettempdir()) / "agent-rules-bench"))
