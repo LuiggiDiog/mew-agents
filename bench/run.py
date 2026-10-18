@@ -8,6 +8,7 @@ the agent never saw.
 """
 
 import argparse
+import collections
 import concurrent.futures as futures
 import datetime as dt
 import json
@@ -172,12 +173,18 @@ def tests_in_output(text: str) -> tuple[int, int]:
 def transcript_metrics(events: list[dict], variant: str) -> dict:
     tool_calls, commands, edits, labels, subagents, seq = 0, [], [], [], 0, 0
     reads: list[tuple[int, str]] = []
+    failed_tool_calls = 0
     pending: dict[str, tuple[float, list[str]]] = {}
     check_s = unit_tests = e2e_tests = 0.0
     for event in events:
         content = event.get("message", {}).get("content", [])
         if event.get("type") == "user" and isinstance(content, list):
             for block in content:
+                if block.get("type") == "tool_result" and block.get("is_error"):
+                    # A red test run is an expected failure, not a wasted action.
+                    started = pending.get(block.get("tool_use_id"))
+                    if not (started and started[1]):
+                        failed_tool_calls += 1
                 if block.get("type") != "tool_result" or block.get("tool_use_id") not in pending:
                     continue
                 started, kinds = pending.pop(block["tool_use_id"])
@@ -205,6 +212,10 @@ def transcript_metrics(events: list[dict], variant: str) -> dict:
                 commands.append(command)
                 shell, bodies = split_heredocs(command)
                 kinds: list[str] = []
+                # cat/head/tail/sed -n on a source, test, or doc file count as reads too.
+                for part in re.split(r"\n|&&|\|\||;", shell):
+                    if re.match(r"\s*(cat|head|tail|sed -n|bat)\b", part):
+                        reads += [(seq, f"/{path}") for path in re.findall(r"[\w./-]+\.(?:tsx?|jsx?|css|md|json)\b", part)]
                 # Walk the command in order: heredoc scripts that write files (python3 - <<EOF ...
                 # open(p, 'w')) and shell edits (sed -i, perl -pi, redirects) are edits; the rest
                 # is classified as checks. Sub-steps keep their order inside one command.
@@ -224,11 +235,6 @@ def transcript_metrics(events: list[dict], variant: str) -> dict:
                 edits.append((seq, data.get("file_path", "")))
             elif name == "Read":
                 reads.append((seq, data.get("file_path", "")))
-        if name == "Bash":
-            # cat/head/tail/sed -n on a source or test file count as reads too.
-            for part in re.split(r"\n|&&|\|\||;", data.get("command", "")):
-                if re.match(r"\s*(cat|head|tail|sed -n|bat)\b", part):
-                    reads += [(seq, f"/{path}") for path in re.findall(r"[\w./-]+\.(?:tsx?|jsx?|css|md|json)\b", part)]
     is_test = lambda p: bool(re.search(r"\.test\.|\.spec\.|/e2e/", p))
     is_src = lambda p: "/src/" in p and not is_test(p)
     first_test = next((i for i, p in edits if is_test(p)), None)
@@ -239,6 +245,8 @@ def transcript_metrics(events: list[dict], variant: str) -> dict:
         for i, l in labels
     )
     count = lambda prefix: sum(1 for _, l in labels if l.startswith(prefix))
+    edits_per_file = collections.Counter(path.rsplit("/", 1)[-1] for _, path in edits)
+    edit_churn = sum(1 for n in edits_per_file.values() if n > 2)
     repeated_reads, last_read = 0, {}
     for at, path in sorted(reads):
         name = path.rsplit("/", 1)[-1]
@@ -253,7 +261,8 @@ def transcript_metrics(events: list[dict], variant: str) -> dict:
         "builds": count("build"), "typecheck": count("typecheck"), "lint": count("lint"),
         "unit_tests_executed": int(unit_tests), "e2e_tests_executed": int(e2e_tests),
         "check_time_s": round(check_s, 1),
-        "test_first": test_first, "red_seen": red_seen, "repeated_reads": repeated_reads, "commands": commands,
+        "test_first": test_first, "red_seen": red_seen, "repeated_reads": repeated_reads,
+        "failed_tool_calls": failed_tool_calls, "edit_churn": edit_churn, "commands": commands,
     }
 
 

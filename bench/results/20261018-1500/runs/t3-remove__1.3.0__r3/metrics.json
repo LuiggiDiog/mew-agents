@@ -57,5 +57,8 @@
     "hidden": true,
     "no_wait_for_timeout": true,
     "e2e_failed_files": []
-  }
+  },
+  "repeated_reads": 0,
+  "failed_tool_calls": 0,
+  "edit_churn": 0
 }

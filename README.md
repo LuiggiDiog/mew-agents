@@ -49,3 +49,9 @@ The agent discovers the stack, fills the variables, copies or merges the files, 
 - `AGENTS.md` stays short (about 140 content lines once rendered): binding rules only, with checklists and procedures in skills and docs that load on demand. E2E runs only against local or test environments, never production.
 - The benchmark in `bench/` runs only when the maintainer explicitly asks for it. Agents never run it on their own, as a validation step, or as part of a release.
 - Never put domain rules in the template. They belong to each project's own area in `AGENTS.md` and `docs/context/`.
+
+## Deferred
+
+Decided but not applied yet. Each item names what would trigger it.
+
+- **Cheaper models for the read-only profiles.** `quality-reviewer` and `verification-runner` only run checks, read output, and list findings, so a faster model at medium effort would likely do the same work sooner and cheaper. Codex already runs `verification_runner` on `gpt-6-luna` at medium effort; Claude Code runs `verification-runner` on `sonnet` with no `effort`, and `quality-reviewer` inherits the session model in Claude Code and uses `gpt-6-sol` at high effort in Codex. The change: `model: sonnet` and `effort: medium` on both Claude Code profiles, and `gpt-6-luna` on `quality_reviewer` in Codex, so both formats say the same. The profiles that write code keep the session model. Trigger: a benchmark task large enough to justify delegation, so a cheaper reviewer that misses bugs would show up in the hidden tests before the change ships.

@@ -21,6 +21,9 @@ Model `sonnet`, fixture `bench/fixture` (Vite + React, pnpm, 9 unit and 18 E2E t
 | Full unit suite runs (total) | 17 | 15 (-12% ✅) | 22 (+29% ⚠️) | 18 (+6% ⚠️) | 1 (-94% ✅) | 1 (-94% ✅) |
 | Full E2E suite runs (total; forbidden without a request) | 0 | 0 | 0 | 0 | 0 | 0 |
 | E2E runs paying a production build (mean) | 0.15 | 0.30 (+100% ⚠️) | 0.50 (+233% ⚠️) | 0.45 (+200% ⚠️) | 0.35 (+133% ⚠️) | 0.50 (+233% ⚠️) |
+| Repeated file reads with no edit in between (mean) | 0.05 | 0.05 (+0%) | 0.05 (+0%) | 0.25 (+400% ⚠️) | 0.05 (+0%) | 0.15 (+200% ⚠️) |
+| Failed tool calls, excluding test runs (mean) | 0.10 | 0.10 (+0%) | 0.05 (-50% ✅) | 0 (-100% ✅) | 0 (-100% ✅) | 0.15 (+50% ⚠️) |
+| Files edited more than twice (mean) | 0.05 | 0 (-100% ✅) | 0 (-100% ✅) | 0 (-100% ✅) | 0.05 (+0%) | 0 (-100% ✅) |
 | Subagents spawned (total) | 0 | 0 | 0 | 0 | 0 | 0 |
 
 ## By task

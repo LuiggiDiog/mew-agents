@@ -31,6 +31,8 @@ Measures whether a template version makes an agent faster without losing quality
 | Focused versus full unit and E2E runs, production builds paid | Shell commands in the transcript | Fewer full runs and builds |
 | Full E2E suite runs | Same | 0: every version forbids it without a request |
 | Repeated file reads with no edit in between | `Read` calls and `cat`/`head`/`tail`/`sed -n` in the transcript | Lower |
+| Failed tool calls | Tool results flagged as errors in the transcript, excluding test runs (a red test is expected) | Lower |
+| Files edited more than twice | Edits per file in the transcript | Lower: churn means the agent is iterating on the same file instead of landing the change |
 
 A version is better only if speed improves and quality stays equal or better. Faster with lower quality is a regression.
 
