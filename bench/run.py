@@ -136,7 +136,9 @@ def classify(command: str, variant: str) -> list[str]:
     """Label each test-related part of a shell command."""
     labels = []
     for part in re.split(r"&&|\|\||;|\|", command):
-        if "playwright test" in part or re.search(r"run (test:)?e2e", part):
+        if "affected-tests" in part:
+            labels.append("affected")
+        elif "playwright test" in part or re.search(r"run (test:)?e2e", part):
             if "--list" in part:
                 labels.append("e2e_list")
                 continue

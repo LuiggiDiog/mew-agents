@@ -237,7 +237,7 @@ Follow the test selection ladder in `AGENTS.md` (Validation). For E2E it means:
 
 1. `e2e --list` after structural edits.
 2. While iterating: the changed spec with `--grep "<title>"` and `-x`, against the dev server.
-3. Before reporting, once, against the dev server (`e2e-build` only when the change can behave differently in a production build: routes, build configuration, dependencies, assets, environment variables, server rendering): the union of spec files from `e2e --list --only-changed` and from `grep -rl "@<module>"` for each touched module, passed as explicit paths (both filters in one command intersect). Use `--only-changed=<base>` when the work is committed; if a touched module has no tagged spec, find its specs by route, page object, or visible text. An empty selection is never green.
+3. Before reporting, once, against the dev server (`e2e-build` only when the change can behave differently in a production build: routes, build configuration, dependencies, assets, environment variables, server rendering): the specs the `affected` command lists, passed as explicit paths in one call. The command unions the specs `--only-changed` relates to the change (changed specs, page objects, helpers) with the specs tagged with each touched module; it never combines `--only-changed` with `--grep`, because Playwright intersects them. Pass the base branch (`affected <base>`) when the work is committed; if a touched module has no tagged spec, find its specs by route, page object, or visible text. An empty selection is never green.
 4. After fixing failures: the command that failed, with `--last-failed`.
 5. The complete suite only when the user asks for it.
 

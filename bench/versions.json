@@ -93,7 +93,8 @@
         "PM_ADD_DEV": "pnpm add -D",
         "CMD_TYPECHECK": "pnpm exec tsc --noEmit --incremental",
         "CMD_TEST_RELATED": "pnpm exec vitest related --run <files>",
-        "CMD_LINT_FILES": "pnpm exec eslint --cache <files>"
+        "CMD_LINT_FILES": "pnpm exec eslint --cache <files>",
+        "CMD_TEST_LIST_CHANGED": "pnpm exec vitest list --filesOnly --changed=<base>"
       }
     }
   }

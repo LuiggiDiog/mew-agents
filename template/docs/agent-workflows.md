@@ -10,6 +10,7 @@ The primary thread (the session you talk to) is the **orchestrator**. It owns th
 | --------------- | ----------------------------------- | ------------------------------- |
 | Project rules   | `CLAUDE.md` → imports `AGENTS.md`   | `AGENTS.md`                     |
 | Skills          | `.claude/skills/` (symlink)         | `.agents/skills/`               |
+| Shared scripts  | `.agents/scripts/`                  | `.agents/scripts/`              |
 | Agent profiles  | `.claude/agents/*.md`               | `.codex/agents/*.toml`          |
 | Session config  | `.claude/settings.json`             | `.codex/config.toml`            |
 

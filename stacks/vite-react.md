@@ -16,6 +16,7 @@ Snippets for `{{STACK:<name>}}` markers. Based on a Vite + React single-page app
 | `{{CMD_LINT}}` / `{{CMD_TYPECHECK}}` | `{{RUN:lint}}` / `{{EXEC:tsc --noEmit --incremental}}` (verify: `{{EXEC:tsc -b}}` with project references; `n/a` in a JavaScript project) |
 | `{{CMD_TEST}}` / `{{CMD_TEST_WATCH}}` / `{{CMD_TEST_FILE}}` | `{{EXEC:vitest run}}` / `{{RUN:test}}` / `{{EXEC:vitest run <file>}}` |
 | `{{CMD_TEST_RELATED}}` / `{{CMD_LINT_FILES}}` | `{{EXEC:vitest related --run <files>}}` / `{{EXEC:eslint --cache <files>}}` |
+| `{{CMD_TEST_LIST_CHANGED}}` | `{{EXEC:vitest list --filesOnly --changed=<base>}}` |
 | `{{CMD_E2E}}` | `{{EXEC:playwright test --config=e2e/playwright.config.ts}}` |
 
 ### toolchain

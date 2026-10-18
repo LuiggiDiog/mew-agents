@@ -57,6 +57,7 @@ Every template file uses `{{VARIABLE}}` placeholders. Replace all of them; a lef
 | `{{CMD_TEST_WATCH}}` | Unit tests in watch mode | `pnpm run test:watch` |
 | `{{CMD_TEST_FILE}}` | Run one unit test file | `pnpm run test <file>` |
 | `{{CMD_TEST_RELATED}}` | Run the unit tests that cover the given source files | `pnpm exec vitest related --run <files>` |
+| `{{CMD_TEST_LIST_CHANGED}}` | List, without running, the unit test files related to the changes since `<base>` (`n/a` when the runner cannot) | `pnpm exec vitest list --filesOnly --changed=<base>` |
 | `{{CMD_LINT_FILES}}` | Lint only the given files, with cache | `pnpm exec eslint --cache <files>` |
 | `{{CMD_E2E}}` | Playwright base command, including config if not at the root | `pnpm exec playwright test` |
 
@@ -101,6 +102,7 @@ Copy from `template/` into the project root, after filling variables and snippet
 | `CLAUDE.md` | Write `@AGENTS.md` | Keep if it already loads `AGENTS.md`; if it only links to it, replace with `@AGENTS.md` and say why (a link does not load the content) |
 | `DESIGN.md` | Write the skeleton | **Never overwrite.** Keep as is |
 | `.agents/skills/*/` | Write all six, with their `scripts/` | Replace a skill with the same name; keep other skills |
+| `.agents/scripts/affected-tests.mjs` | Write it (the `affected` command) | Replace |
 | `.claude/skills` | Symlink to `../.agents/skills` | Keep; if `.claude/skills` is a real folder, move its skills to `.agents/skills/` and ask before replacing it with the symlink |
 | `.claude/agents/*.md`, `.codex/agents/*.toml` | Write all five in each format the user uses | Replace profiles with the same name; keep others |
 | `.claude/settings.json` | Write it (turns off commit and PR attribution) | Keep every existing key; set only `attribution` to the template's value and say so |
@@ -137,6 +139,7 @@ Run only what exists; do not install anything unless the user chose that in step
 - Every `.codex/agents/*.toml` parses (balanced `"""`, quoted strings), and `lighthouserc.json` and `.claude/settings.json` parse as JSON.
 - If Playwright is configured: the `e2e` command with `--list` lists specs without starting the server. Report specs without a module tag (`@<module>`) as a follow-up; do not tag them during the apply.
 - If a unit runner is configured: run one existing test file with the `test-file` command.
+- If Playwright or a unit runner is configured: the `affected` command runs from the project root and prints its sections (with no changes, every section is empty and no command is proposed).
 - If a type check exists: the `typecheck` command.
 - Optional, Claude Code 2.1.283 or later: `/doctor prompt-audit` reports contradictions and stale rules across `AGENTS.md`, rules, skills, and profiles. Report what it finds; do not edit template blocks to resolve it.
 

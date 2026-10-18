@@ -13,6 +13,7 @@ template/                # files copied into a project, with {{VARIABLES}} and {
   DESIGN.md              # design standards skeleton (Google Labs DESIGN.md format)
   lighthouserc.json      # Lighthouse CI: key routes, minimum scores, metric budgets (median of 3 runs)
   .agents/skills/        # tdd-change, e2e-playwright, ui-accessibility, mobile-ux, web-performance, release-verification
+  .agents/scripts/       # affected-tests.mjs: the `affected` command (tests and specs that cover the touched files)
   .claude/agents/        # Claude Code profiles (.md); .claude/skills -> ../.agents/skills
   .claude/settings.json  # Claude Code settings: no AI attribution in commits or PRs
   .codex/agents/         # Codex profiles (.toml) + .codex/config.toml

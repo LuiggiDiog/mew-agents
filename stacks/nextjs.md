@@ -16,6 +16,7 @@ Snippets for `{{STACK:<name>}}` markers. Each `###` section body replaces the ma
 | `{{CMD_LINT}}` / `{{CMD_TYPECHECK}}` | `{{RUN:lint}}` / `{{RUN:typecheck}}` |
 | `{{CMD_TEST}}` / `{{CMD_TEST_WATCH}}` / `{{CMD_TEST_FILE}}` | `{{RUN:test}}` / `{{RUN:test:watch}}` / `{{RUN:test <file>}}` |
 | `{{CMD_TEST_RELATED}}` / `{{CMD_LINT_FILES}}` | `{{EXEC:vitest related --run <files>}}` / `{{EXEC:eslint --cache <files>}}` |
+| `{{CMD_TEST_LIST_CHANGED}}` | `{{EXEC:vitest list --filesOnly --changed=<base>}}` (Jest: `{{EXEC:jest --listTests --changedSince=<base>}}`) |
 | `{{CMD_E2E}}` | `{{EXEC:playwright test}}` |
 
 ### toolchain

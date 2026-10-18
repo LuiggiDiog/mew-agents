@@ -19,6 +19,7 @@ Snippets for `{{STACK:<name>}}` markers. Based on an Angular 20 CLI application 
 | `{{CMD_TEST_FILE}}` | `{{RUN:test --watch=false --browsers=ChromeHeadless --include=<file>}}` |
 | `{{CMD_TEST_RELATED}}` | `{{RUN:test --watch=false --browsers=ChromeHeadless --include=<spec> --include=<spec>}}` with the specs of the touched files and of the files that import them (Karma has no import-graph mode) |
 | `{{CMD_LINT_FILES}}` | `{{EXEC:eslint --cache <files>}}` (verify the project uses `angular-eslint` with an ESLint config) |
+| `{{CMD_TEST_LIST_CHANGED}}` | `n/a` (Karma cannot list by changed files; `affected` then lists only the E2E side) |
 | `{{CMD_E2E}}` | `{{EXEC:playwright test --config=e2e/playwright.config.ts}}` |
 
 ### toolchain

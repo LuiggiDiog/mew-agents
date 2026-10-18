@@ -27,6 +27,7 @@ The exact commands are defined once, in the Toolchain section of `AGENTS.md`. Th
 | --- | --- |
 | One unit test file | `test-file` |
 | TDD loop | `test-watch` |
+| Tests and specs that cover the touched files, with the commands to run | `affected` (`affected <base>` once the work is committed) |
 | Unit tests that cover the touched files | `test-related` with the files |
 | All unit and component tests | `test` |
 | Lint touched files, type check | `lint-files` with the files, `typecheck` |

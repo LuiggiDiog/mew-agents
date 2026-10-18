@@ -84,6 +84,7 @@ This section is the only place that names the runtime, the package manager, and 
 | `test-file` | `{{CMD_TEST_FILE}}` | One unit test file |
 | `test-related` | `{{CMD_TEST_RELATED}}` | Unit tests that cover the given source files |
 | `lint-files` | `{{CMD_LINT_FILES}}` | Lint only the given files, with cache |
+| `affected` | `node .agents/scripts/affected-tests.mjs [<base>]` | Lists the unit tests and specs that cover the touched files (uncommitted, or since `<base>`) and prints the level 2 commands; its own commands were filled in with this table |
 | `e2e` | `{{CMD_E2E}}` | Playwright against the dev server; append spec paths, `--list`, `--grep "<title or @tag>"`, `--only-changed`, `--last-failed`, `-x`, or `--debug` |
 | `e2e-build` | `E2E_BUILD=1 {{CMD_E2E}}` | Same, against a local production build that Playwright builds and serves itself (CI sets it through `CI`; PowerShell sets `$env:E2E_BUILD=1` first) |
 | `e2e-install` | `{{EXEC:playwright install chromium}}` | Playwright browser, once per machine |
@@ -177,13 +178,13 @@ Validate every change with the smallest scope that proves it. Climb one level on
 | Level | When | Unit | E2E |
 | --- | --- | --- | --- |
 | 1. Focused | While iterating on a task | `test-file` with the test being written | `e2e` with the spec, `--grep "<title>"`, and `-x` |
-| 2. Related | Once the tasks are green, before reporting | `test-related` with the touched source files | `e2e` once, with the union of changed specs and specs tagged with each touched module (see below); `e2e-build` instead only when production can differ |
+| 2. Related | Once the tasks are green, before reporting | `test-related` with the touched source files | `e2e` once, with the specs `affected` lists; `e2e-build` instead only when production can differ |
 | 3. Failed | After fixing failures found at level 2 | the failing test files | the command that failed, with `--last-failed` |
 | 4. Full | Only on explicit request; for unit tests also when test config, dependencies, or a module imported almost everywhere changed | `test` | the complete `e2e`, only on explicit request |
 
 - Level 2 E2E runs against the dev server. Use `e2e-build` for that single run only when the change can behave differently in a production build: routes or lazy chunks, build or bundler configuration, dependencies, assets, environment variables, or server rendering. Text, style, component, and service changes stay on the dev server, so a build is paid at most once per task and only when it proves something.
-- The level 2 E2E selection is a union of spec files passed explicitly to one call: the files `e2e --list --only-changed` reports (changed specs, and specs whose page objects or helpers changed) plus the files tagged with each touched module (`grep -rl "@<module>" {{E2E_DIR}}`). Never put `--only-changed` and `--grep` in the same command: Playwright intersects them. `--only-changed` sees only uncommitted changes; once the work is committed, pass the base branch (`--only-changed=<base>`).
-- Never accept an empty selection as green. When a touched module has no tagged spec, find its specs by route, page object, or visible text, run them, and report the missing tag as a follow-up.
+- Level 2 starts with `affected` (with the base branch once the work is committed): it lists the unit tests the runner relates to the change, the specs Playwright relates to it, the specs tagged with each touched module, and the commands to run. Run those commands as printed, in one call per runner.
+- Never accept an empty selection as green. When `affected` finds no spec for a touched module, find its specs by route, page object, or visible text, run them, and report the missing tag as a follow-up.
 - Skip what the change cannot affect: documentation-only changes run no tests; style-only changes run no unit tests and are inspected; a test-only change runs only that test. Prefer automated checks; use inspection only for what no check can prove, and say so in the report.
 - Run `lighthouse` once per task, after the level 2 checks, only when the change can move a score: a new or changed route, `index.html` or the document head, images, fonts, or other assets, a client dependency, build configuration, or the layout of a route's first screen. Never for a text, control, or component change, a service, tests, or documentation. It audits a production build: reuse the one `e2e-build` just made, or run `build` first. A score under its threshold is a failure, like a red test.
 - Run `lint-files` on the touched files and `typecheck` once per task, not after every edit. Do not re-run a green check unless the code it covers changed. Do not run `build` on its own unless the user asks or production behavior cannot be validated otherwise.
