@@ -14,6 +14,7 @@ template/                # files copied into a project, with {{VARIABLES}} and {
   lighthouserc.json      # Lighthouse CI: key routes and minimum scores
   .agents/skills/        # tdd-change, e2e-playwright, ui-accessibility, mobile-ux, web-performance, release-verification
   .claude/agents/        # Claude Code profiles (.md); .claude/skills -> ../.agents/skills
+  .claude/settings.json  # Claude Code settings: no AI attribution in commits or PRs
   .codex/agents/         # Codex profiles (.toml) + .codex/config.toml
   docs/                  # testing, e2e-playbook, agent-workflows, architecture skeleton
 bench/                   # behavioral benchmark: same tasks per template version (see bench/README.md)

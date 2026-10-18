@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.1 — 2026-10-18
+
+- `commits`: never add AI or tool attribution to commits or pull requests (`Co-Authored-By` naming an AI, "Generated with" lines, tool links, robot emoji), overriding tool defaults; human co-authors only on request.
+- New `.claude/settings.json` that turns off Claude Code's commit and PR attribution (`attribution.commit` and `attribution.pr` empty, `sessionUrl` false; this form also works on versions before 2.1.281). `APPLY.md` merges only that key into an existing file.
+
 ## 1.6.0 — 2026-10-17
 
 - Lighthouse: every key route meets Performance, Best Practices, and SEO 90 and Accessibility 95 on the mobile profile. New `performance` block in `AGENTS.md` with the binding rules and a `{{STACK:performance}}` snippet per stack (Next.js `next/image`, `next/font`, Metadata API, `next/script`; Vite lazy routes and chunk checks; Angular `NgOptimizedImage`, lazy routes, `@defer`, budgets).

@@ -11,7 +11,7 @@ The primary thread (the session you talk to) is the **orchestrator**. It owns th
 | Project rules   | `CLAUDE.md` → imports `AGENTS.md`   | `AGENTS.md`                     |
 | Skills          | `.claude/skills/` (symlink)         | `.agents/skills/`               |
 | Agent profiles  | `.claude/agents/*.md`               | `.codex/agents/*.toml`          |
-| Session config  | —                                   | `.codex/config.toml`            |
+| Session config  | `.claude/settings.json`             | `.codex/config.toml`            |
 
 `.claude/skills` is a symlink to `.agents/skills`, so each skill is written once. Agent profiles exist in both formats with the same instructions; when you change one, change its counterpart in the same commit.
 

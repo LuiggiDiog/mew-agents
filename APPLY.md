@@ -103,6 +103,7 @@ Copy from `template/` into the project root, after filling variables and snippet
 | `.agents/skills/*/` | Write all six, with their `scripts/` | Replace a skill with the same name; keep other skills |
 | `.claude/skills` | Symlink to `../.agents/skills` | Keep; if `.claude/skills` is a real folder, move its skills to `.agents/skills/` and ask before replacing it with the symlink |
 | `.claude/agents/*.md`, `.codex/agents/*.toml` | Write all five in each format the user uses | Replace profiles with the same name; keep others |
+| `.claude/settings.json` | Write it (turns off commit and PR attribution) | Keep every existing key; set only `attribution` to the template's value and say so |
 | `.codex/config.toml` | Write it | Keep the existing one |
 | `docs/testing.md`, `docs/e2e-playbook.md`, `docs/agent-workflows.md` | Write them | Replace, after moving any project-specific content into `docs/context/` or the preserved area and saying so |
 | `lighthouserc.json` | Write it, with the key routes (1–5 public, representative URLs inferred from the router; ask only if none is obvious) | Keep; report thresholds lower than the template's |
@@ -132,7 +133,7 @@ Run only what exists; do not install anything unless the user chose that in step
 - No package manager is named outside the Toolchain block of `AGENTS.md`: `grep -rnwE 'npm|npx|pnpm|yarn|bun|bunx' .agents .claude/agents .codex/agents DESIGN.md docs/agent-workflows.md docs/e2e-playbook.md docs/architecture.md` returns nothing. The only expected matches elsewhere are config code that runs a command, such as `webServer.command` in the setup section of `docs/testing.md`. A preserved `DESIGN.md` or `docs/architecture.md` from an older template version may still name one; report it instead of rewriting those files.
 - The `design-lint` command from the Toolchain block reports no errors (the empty skeleton passes).
 - Symlink: `ls -la .claude/skills` points to `../.agents/skills`.
-- Every `.codex/agents/*.toml` parses (balanced `"""`, quoted strings), and `lighthouserc.json` parses as JSON.
+- Every `.codex/agents/*.toml` parses (balanced `"""`, quoted strings), and `lighthouserc.json` and `.claude/settings.json` parse as JSON.
 - If Playwright is configured: the `e2e` command with `--list` lists specs without starting the server. Report specs without a module tag (`@<module>`) as a follow-up; do not tag them during the apply.
 - If a unit runner is configured: run one existing test file with the `test-file` command.
 - If a type check exists: the `typecheck` command.
