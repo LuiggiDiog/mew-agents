@@ -64,5 +64,6 @@
     "e2e_failed_files": [
       "zz-hidden.spec.ts"
     ]
-  }
+  },
+  "affected_runs": 1
 }

@@ -1,0 +1,10 @@
+# Analysis 20261019-1105
+
+2.0.0 (tag `v2.0.0`) alone, 4 tasks, 5 repetitions, Sonnet, Node 24, 3.9 min. Purpose: measure the adoption of the `affected` command after the validation rule was reinforced ("level 2 always starts by running `affected`"). Baseline: the previous run (`20261018-1637`, the working tree before the reinforcement, labeled 1.7.0).
+
+## Findings
+
+1. **Adoption went from 13/20 to 20/20.** Per task, before and after: `t1-typo` 4/5 to 5/5, `t2-total` 1/5 to 5/5, `t3-remove` 5/5 to 5/5, `t4-currency` 3/5 to 5/5. Every run ran its level 2 E2E selection; no run concluded that no spec applied. The case that left two specs red in the previous run did not recur: unit, E2E, and typecheck were green after every agent.
+2. **Lint was red after every run, because of the template, not the agent.** The rendered `.agents/hooks/guard.mjs` had a `no-useless-escape` error under the fixture's ESLint config, and `eslint .` lints dot folders. The agent never touched that file. Fixed in 2.0.1; the three template scripts now pass the fixture's config. The "all suites green 0/20" row in `REPORT.md` is this.
+3. **In a two-module fixture, `affected` selects every spec.** Mean E2E tests per run: 18.3 of 18, for every task, including the service-only `t2-total` (0 to 1 E2E runs before). The selection unions the specs Playwright relates to the change, the specs tagged with the touched module, and the specs tagged with the modules of the unit tests the runner relates to it; with `cart` and `catalog` importing each other's code, that is the whole suite. Check time rose from 10.8 s to 13.5 s per run and wall time from 0.55 to 0.61 min, still on the dev server with no production build. In a project with more modules the selection is narrower; the trade is coverage for the scope trap (`t4`) against breadth on tiny projects.
+4. **Everything else held.** Hidden tests 18/20 (the ambiguous task asked in 3 of 5 runs, within its 3–5 range across runs), test-first 14/15, full unit suite 0, production builds 0, question rounds 3, cost 0.18 USD per run.

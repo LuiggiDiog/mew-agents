@@ -24,6 +24,7 @@ Model `sonnet`, fixture `bench/fixture` (Vite + React, pnpm, 9 unit and 18 E2E t
 | Repeated file reads with no edit in between (mean) | 0.10 | 0 (-100% ✅) |
 | Failed tool calls, excluding test runs (mean) | 0.05 | 0.05 (+0%) |
 | Files edited more than twice (mean) | 0 | 0 |
+| Runs that ran `affected` before reporting (2.0.0+) | 0/20 | 13/20 |
 | Subagents spawned (total) | 0 | 0 |
 
 ## By task

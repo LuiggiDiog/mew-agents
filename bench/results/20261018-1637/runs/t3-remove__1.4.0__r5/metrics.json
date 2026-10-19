@@ -61,5 +61,6 @@
     "hidden": true,
     "no_wait_for_timeout": true,
     "e2e_failed_files": []
-  }
+  },
+  "affected_runs": 0
 }

@@ -57,6 +57,7 @@ ROWS = [
     ("Repeated file reads with no edit in between (mean)", lambda rs: mean([r.get("repeated_reads", 0) for r in rs]), True),
     ("Failed tool calls, excluding test runs (mean)", lambda rs: mean([r.get("failed_tool_calls", 0) for r in rs]), True),
     ("Files edited more than twice (mean)", lambda rs: mean([r.get("edit_churn", 0) for r in rs]), True),
+    ("Runs that ran `affected` before reporting (2.0.0+)", lambda rs: rate([r.get("affected_runs", 0) > 0 for r in rs]), None),
     ("Subagents spawned (total)", lambda rs: sum(r["subagents"] for r in rs), None),
 ]
 

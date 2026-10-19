@@ -1,0 +1,6 @@
+
+/private/var/folders/6g/l30_y37d7y564brvzmsg32h80000gn/T/agent-rules-bench/runs/t4-currency__2.0.0__r5/.agents/hooks/guard.mjs
+  15:47  error  Unnecessary escape character: \/  no-useless-escape
+
+✖ 1 problem (1 error, 0 warnings)
+

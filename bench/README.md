@@ -30,6 +30,7 @@ Measures whether a template version makes an agent faster without losing quality
 | Question rounds | Runs that ended without changes and needed the canned answer | Lower, unless the task is ambiguous |
 | Focused versus full unit and E2E runs, production builds paid | Shell commands in the transcript | Fewer full runs and builds |
 | Full E2E suite runs | Same | 0: every version forbids it without a request |
+| Runs that ran `affected` before reporting | `affected-tests.mjs` in the shell commands | Higher, from 2.0.0: level 2 must start with it |
 | Repeated file reads with no edit in between | `Read` calls and `cat`/`head`/`tail`/`sed -n` in the transcript | Lower |
 | Failed tool calls | Tool results flagged as errors in the transcript, excluding test runs (a red test is expected) | Lower |
 | Files edited more than twice | Edits per file in the transcript | Lower: churn means the agent is iterating on the same file instead of landing the change |
@@ -39,9 +40,9 @@ A version is better only if speed improves and quality stays equal or better. Fa
 ## Run it
 
 ```bash
-python3 bench/run.py                          # all tasks, v1.4.0 vs v2.0.0 (working tree), 5 repetitions, Sonnet, 6 runs at a time
+python3 bench/run.py                          # all tasks, v1.4.0 vs v2.0.1 (working tree), 5 repetitions, Sonnet, 6 runs at a time
 python3 bench/run.py --reps 5 --model opus    # more repetitions for less noise
-python3 bench/run.py --tasks t2-total --versions 2.0.0
+python3 bench/run.py --tasks t2-total --versions 2.0.1
 python3 bench/run.py --rescore bench/results/<stamp>   # recompute metrics from saved transcripts
 python3 bench/report.py                       # rebuild the latest REPORT.md
 ```

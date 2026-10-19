@@ -54,7 +54,7 @@ The agent discovers the stack, fills the variables, copies or merges the files, 
 
 1. `python3 bench/render.py <version> <dir>` for every version in `bench/versions.json` renders without leftovers, and the rendered `lighthouserc.json` and `.claude/settings.json` parse.
 2. The verify step of `APPLY.md` passes on the rendered working tree (markers balanced, no package manager named outside the Toolchain, every command name in skills and profiles exists in the Commands table, Claude Code and Codex profiles identical).
-3. `node --check` on the three scripts, and the guard denies `npm test` with exit code 2.
+3. `node --check` on the three scripts, `eslint` on them with the fixture's config (`bench/fixture/eslint.config.js`: `eslint .` in a project lints `.agents/`), and the guard denies `npm test` with exit code 2.
 4. `/doctor prompt-audit` in a Claude Code session on the rendered tree reports no contradictions.
 5. `CHANGELOG.md` has the entry, with a **Breaking** lead when a command, variable, or file name changed.
 6. The benchmark runs only when the maintainer asks; when it does, the new version must keep quality and not lose speed (see `bench/README.md`).

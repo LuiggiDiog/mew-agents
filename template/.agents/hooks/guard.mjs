@@ -12,7 +12,7 @@ const TEST_HOSTS = /^(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])$|(^|[.-])(local
 const UNIT_RUNNER = /\b(vitest|jest|ng test|karma start)\b|\b(npm|pnpm|yarn|bun)\s+(run\s+)?test(:unit)?(?![:\w-])/;
 const UNIT_SELECTION = /\b(related|list|--changed|--related|--include=|--findRelatedTests|--onlyChanged|--changedSince|--testNamePattern|--testPathPattern)|\s-t\s|[\w./\\-]+\.(test|spec)\.[cm]?[jt]sx?/;
 // A positional path (a test file or folder) is a selection; the value of a flag such as --root is not.
-const positionalPath = (part) => /\s[\w.\\-]*[\/\\][\w./\\-]+/.test(part.replace(/--[\w-]+(=\S+|\s+(?!-)\S+)?/g, ''));
+const positionalPath = (part) => /\s[\w.\\-]*[/\\][\w./\\-]+/.test(part.replace(/--[\w-]+(=\S+|\s+(?!-)\S+)?/g, ''));
 const E2E_RUNNER = /\bplaywright test\b|\b(npm|pnpm|yarn|bun)\s+(run\s+)?(test:e2e|e2e)(?![:\w-])/;
 const E2E_SELECTION = /--grep\b|-g\s|--only-changed|--last-failed|--list|--ui\b|[\w./-]+\.(spec|test)\.[cm]?[jt]sx?/;
 

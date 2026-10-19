@@ -141,6 +141,7 @@ Run only what exists; do not install anything unless the user chose that in step
 - If Playwright is configured: the `e2e` command with `--list` lists specs without starting the server. Report specs without a module tag (`@<module>`) as a follow-up; do not tag them during the apply.
 - If a unit runner is configured: run one existing test file with the `test-file` command.
 - If Playwright or a unit runner is configured: the `affected` command runs from the project root and prints its sections (with no changes, every section reads `(none)`, and the commands block says `(no unit tests to run)` and `(no spec selected: ...)`).
+- If ESLint is configured: `lint-files` on `.agents/hooks/guard.mjs`, `.agents/scripts/affected-tests.mjs`, and `.agents/skills/web-performance/scripts/lighthouse-audits.mjs` passes. If the project's rules reject them, add `.agents/**` to the ESLint ignores and say so, instead of editing the scripts.
 - The guard denies a full suite: `echo '{"tool_input":{"command":"npm test"}}' | node .agents/hooks/guard.mjs` exits with code 2 and prints the reason. Tell the user that Claude Code runs the hook once the folder is trusted and in every `-p` session, and that Codex asks to trust it once with `/hooks`.
 - If a type check exists: the `typecheck` command.
 - Optional, Claude Code 2.1.283 or later: `/doctor prompt-audit` reports contradictions and stale rules across `AGENTS.md`, rules, skills, and profiles. Report what it finds; do not edit template blocks to resolve it.

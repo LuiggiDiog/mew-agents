@@ -1,0 +1,74 @@
+
+
+
+
+Running 19 tests using 7 workers
+
+[1/19] [chromium] › e2e/tests/cart-empty.spec.ts:18:5 › empty cart › leaves the empty state after adding Cake @cart
+[2/19] [chromium] › e2e/tests/cart.spec.ts:12:5 › cart › adds Coffee and shows the total @cart
+[3/19] [chromium] › e2e/tests/cart-empty.spec.ts:18:5 › empty cart › leaves the empty state after adding Coffee @cart
+[4/19] [chromium] › e2e/tests/cart-empty.spec.ts:11:3 › empty cart › hides the total while empty @cart
+[5/19] [chromium] › e2e/tests/cart-empty.spec.ts:5:3 › empty cart › starts empty @cart
+[6/19] [chromium] › e2e/tests/cart.spec.ts:12:5 › cart › adds Tea and shows the total @cart
+[7/19] [chromium] › e2e/tests/cart-empty.spec.ts:18:5 › empty cart › leaves the empty state after adding Tea @cart
+[8/19] [chromium] › e2e/tests/cart.spec.ts:12:5 › cart › adds Cake and shows the total @cart
+[9/19] [chromium] › e2e/tests/cart.spec.ts:21:3 › cart › groups repeated products in one row @cart
+[10/19] [chromium] › e2e/tests/cart.spec.ts:29:3 › cart › sums different products @cart
+[11/19] [chromium] › e2e/tests/catalog-accessibility.spec.ts:5:3 › catalog accessibility › has a page heading and a products heading @catalog
+[12/19] [chromium] › e2e/tests/catalog-accessibility.spec.ts:12:5 › catalog accessibility › Coffee has a reachable add button @catalog
+[13/19] [chromium] › e2e/tests/catalog-accessibility.spec.ts:12:5 › catalog accessibility › Tea has a reachable add button @catalog
+[14/19] [chromium] › e2e/tests/catalog-accessibility.spec.ts:12:5 › catalog accessibility › Cake has a reachable add button @catalog
+[15/19] [chromium] › e2e/tests/catalog.spec.ts:11:3 › catalog › lists every product @catalog
+[16/19] [chromium] › e2e/tests/catalog.spec.ts:17:5 › catalog › shows the price of Coffee @catalog
+[17/19] [chromium] › e2e/tests/catalog.spec.ts:17:5 › catalog › shows the price of Tea @catalog
+[18/19] [chromium] › e2e/tests/catalog.spec.ts:17:5 › catalog › shows the price of Cake @catalog
+[19/19] [chromium] › e2e/tests/zz-hidden.spec.ts:3:1 › hidden: remove takes one unit at a time
+  1) [chromium] › e2e/tests/zz-hidden.spec.ts:3:1 › hidden: remove takes one unit at a time ────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('region', { name: 'Cart' }).getByText(/Coffee × 1/)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('region', { name: 'Cart' }).getByText(/Coffee × 1/) with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Cart' }).getByText(/Coffee × 1/)
+
+
+      11 |   await add('Tea');
+      12 |   await cart.getByRole('button', { name: 'Remove Coffee' }).click();
+    > 13 |   await expect(cart.getByText(/Coffee × 1/)).toBeVisible();
+         |                                              ^
+      14 |
+      15 |   await cart.getByRole('button', { name: 'Remove Coffee' }).click();
+      16 |   await expect(cart.getByText(/Coffee/)).toHaveCount(0);
+        at /private/var/folders/6g/l30_y37d7y564brvzmsg32h80000gn/T/agent-rules-bench/runs/t3-remove__2.0.0__r1/e2e/tests/zz-hidden.spec.ts:13:46
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/zz-hidden-hidden-remove-takes-one-unit-at-a-time-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: e2e/test-results/zz-hidden-hidden-remove-takes-one-unit-at-a-time-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    e2e/test-results/zz-hidden-hidden-remove-takes-one-unit-at-a-time-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace e2e/test-results/zz-hidden-hidden-remove-takes-one-unit-at-a-time-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  1 failed
+    [chromium] › e2e/tests/zz-hidden.spec.ts:3:1 › hidden: remove takes one unit at a time ─────────
+  18 passed (17.1s)
+[WebServer] $ vite build
+[WebServer] [PLUGIN_TIMINGS] JavaScript callbacks ran for 8.3s of this 8.5s build (97%).
+[WebServer] The slowest callbacks, timed inside each callback (the wait before a callback starts is excluded, the time it awaits is included):
+[WebServer]   - plugin production-build-cost buildStart (94%, 8.0s, 1 call)
+[WebServer] Additional callback time came from callbacks under 1s.
+[WebServer] See https://rolldown.rs/reference/InputOptions.checks#bundlertimings for more details.
+[WebServer] 
+[WebServer] $ vite preview --port 4521 --strictPort

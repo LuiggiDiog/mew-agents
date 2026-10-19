@@ -258,7 +258,7 @@ def transcript_metrics(events: list[dict], variant: str) -> dict:
         "unit_focused": count("unit_focused"), "unit_full": count("unit_full"),
         "e2e_focused": count("e2e_focused"), "e2e_full": count("e2e_full"),
         "e2e_prod_runs": count("e2e_focused_prod") + count("e2e_full_prod"),
-        "builds": count("build"), "typecheck": count("typecheck"), "lint": count("lint"),
+        "builds": count("build"), "typecheck": count("typecheck"), "lint": count("lint"), "affected_runs": count("affected"),
         "unit_tests_executed": int(unit_tests), "e2e_tests_executed": int(e2e_tests),
         "check_time_s": round(check_s, 1),
         "test_first": test_first, "red_seen": red_seen, "repeated_reads": repeated_reads,
@@ -335,7 +335,7 @@ def run_one(version: str, task: dict, rep: int, model: str, base: Path, workdir:
     usage = lambda key: sum((r.get("usage") or {}).get(key, 0) for r in results)
     record = {
         "run_id": run_id, "version": version, "task": task["id"], "size": task["size"], "rep": rep,
-        "model": model, "completed": bool(changed_files(ws)),
+        "model": model, "playwright": variant, "completed": bool(changed_files(ws)),
         "question_rounds": len(sessions) - 1,
         "wall_s": round(sum(s["wall_s"] for s in sessions), 1),
         "duration_s": round(sum(r.get("duration_ms", 0) for r in results) / 1000, 1),
@@ -365,7 +365,9 @@ def rescore(results: Path) -> None:
             for line in transcript.read_text().splitlines()
             if line.startswith("{")
         ]
-        record.update(transcript_metrics(events, CONFIG["versions"][record["version"]]["playwright"]))
+        # Old results may name a version that versions.json no longer lists (a working tree later renamed).
+        variant = record.get("playwright") or CONFIG["versions"].get(record["version"], {}).get("playwright", "dev-build")
+        record.update(transcript_metrics(events, variant))
         metrics_file.write_text(json.dumps(record, indent=2, ensure_ascii=False))
         records.append(record)
     (results / "records.json").write_text(json.dumps(records, indent=2, ensure_ascii=False))
@@ -374,7 +376,7 @@ def rescore(results: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--versions", default="1.4.0,2.0.0")
+    parser.add_argument("--versions", default="1.4.0,2.0.1")
     parser.add_argument("--tasks", default="all")
     parser.add_argument("--reps", type=int, default=5)
     parser.add_argument("--model", default="sonnet")

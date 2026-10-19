@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.1 — 2026-10-19
+
+- `guard.mjs` had a `no-useless-escape` error (`\/` inside a character class), so `eslint .` failed in every applied project, because ESLint lints dot folders. The three template scripts now pass a standard `@eslint/js` plus `typescript-eslint` config, and `APPLY.md` verifies it (or asks to ignore `.agents/**` in the project's ESLint config).
+- Benchmark: new metric "runs that ran `affected` before reporting" and the Playwright variant stored per run so old results rescore after a version is renamed. `bench/results/20261019-1105` measures the reinforced validation rule: `affected` adoption went from 13/20 to 20/20 with no suite left red by the agent, at +10% wall time on a two-module fixture where the selection is the whole suite.
+
 ## 2.0.0 — 2026-10-18
 
 **Breaking.** The `e2e-prod` command is `e2e-build` and its switch `E2E_PROD` is `E2E_BUILD` (update the Playwright config and scripts; `APPLY.md` step 5 does it on re-apply). `lighthouse` runs the installed `@lhci/cli` instead of `dlx`, so projects need the dev dependency. `.claude/settings.json` and `.codex/config.toml` now carry a `PreToolUse` hook that blocks full test suites without `FULL_SUITE=1` and E2E against non-test hosts; Codex asks to trust it once. `{{CMD_TEST_WATCH}}` takes a file. New variable `{{CMD_TEST_LIST_CHANGED}}` and new files `.agents/scripts/affected-tests.mjs` and `.agents/hooks/guard.mjs`.
