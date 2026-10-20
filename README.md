@@ -1,4 +1,4 @@
-# agent-rules-template
+# mew-agents
 
 Reusable instructions for AI coding agents (Claude Code and Codex): working rules, Angular-style commits, TDD-first planning, Playwright E2E policy, a design contract (`DESIGN.md`), documentation layout, skills, and agent profiles. One template, adapted per project through variables and per-stack snippets.
 
@@ -30,7 +30,7 @@ stacks/
 
 Open an agent session in the target project and paste:
 
-> Apply the agent-rules template at `<path-to-this-repo>` to this project, following `APPLY.md`. Ask me only what you cannot infer.
+> Apply the mew-agents template at `<path-to-this-repo>` to this project, following `APPLY.md`. Ask me only what you cannot infer.
 
 The agent discovers the stack, fills the variables, copies or merges the files, verifies, and reports. Existing `DESIGN.md`, `docs/architecture.md`, `docs/context/`, and any `AGENTS.md` content outside the template markers are preserved.
 
@@ -48,6 +48,7 @@ The agent discovers the stack, fills the variables, copies or merges the files, 
 - Efficiency without losing quality: each rule lives in one place, agents read only what the task needs, tests climb a selection ladder instead of running full suites, and extra agents are used only when they finish the work sooner.
 - `AGENTS.md` stays short (about 130 content lines once rendered): binding rules only, with checklists and procedures in skills and docs that load on demand. E2E runs only against local or test environments, never production.
 - The benchmark in `bench/` runs only when the maintainer explicitly asks for it. Agents never run it on their own, as a validation step, or as part of a release.
+- The `agent-rules:<id>` marker prefix predates the `mew-agents` name and stays, so projects applied with earlier versions re-apply cleanly.
 - Never put domain rules in the template. They belong to each project's own area in `AGENTS.md` and `docs/context/`.
 
 ## Release checklist

@@ -2,7 +2,7 @@
 
 This file is the procedure an AI coding agent (Claude Code, Codex, or any other) follows to apply the template. Give the agent this repository and the target project, for example:
 
-> Apply the agent-rules template at `<path-to-this-repo>` to this project, following `APPLY.md`. Ask me only what you cannot infer.
+> Apply the mew-agents template at `<path-to-this-repo>` to this project, following `APPLY.md`. Ask me only what you cannot infer.
 
 The agent must read this whole file before touching the target project. It makes no commits and does not modify the Git staging area.
 

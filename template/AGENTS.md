@@ -1,5 +1,5 @@
 <!-- BEGIN:agent-rules:profile -->
-<!-- agent-rules template v{{TEMPLATE_VERSION}}. Sections between BEGIN/END markers come from the template and are replaced when it is re-applied. Anything outside the markers belongs to this project and is preserved. -->
+<!-- mew-agents template v{{TEMPLATE_VERSION}}. Sections between BEGIN/END markers come from the template and are replaced when it is re-applied. Anything outside the markers belongs to this project and is preserved. -->
 
 # Project instructions
 

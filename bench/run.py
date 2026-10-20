@@ -381,7 +381,7 @@ def main() -> None:
     parser.add_argument("--reps", type=int, default=5)
     parser.add_argument("--model", default="sonnet")
     parser.add_argument("--jobs", type=int, default=6, help="concurrent runs; versions of one (task, rep) start together")
-    parser.add_argument("--workdir", default=str(Path(tempfile.gettempdir()) / "agent-rules-bench"))
+    parser.add_argument("--workdir", default=str(Path(tempfile.gettempdir()) / "mew-agents-bench"))
     parser.add_argument("--rescore", help="recompute metrics from the transcripts in this results directory")
     parser.add_argument("--resume", help="continue an interrupted run in this results directory, skipping finished runs")
     args = parser.parse_args()

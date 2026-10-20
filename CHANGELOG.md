@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.2 — 2026-10-20
+
+- The project is now `mew-agents`: the apply prompt and the version comment in `AGENTS.md` use the new name. The `agent-rules:<id>` markers keep their prefix, so re-applying over earlier versions replaces the blocks as before.
+
 ## 2.0.1 — 2026-10-19
 
 - `guard.mjs` had a `no-useless-escape` error (`\/` inside a character class), so `eslint .` failed in every applied project, because ESLint lints dot folders. The three template scripts now pass a standard `@eslint/js` plus `typescript-eslint` config, and `APPLY.md` verifies it (or asks to ignore `.agents/**` in the project's ESLint config).
